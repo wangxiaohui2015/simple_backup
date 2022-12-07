@@ -61,18 +61,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- <plugin> <artifactId>maven-antrun-plugin</artifactId> <executions> 
-				<execution> <phase>prepare-package</phase> <configuration> <tasks> <replace 
-				token="${PROJECT_VERSION}" value="${project.version}" dir="target/build"> 
-				<include name="scripts/*.bat" /> </replace> <replace token="${JRE_VERSION}" 
-				value="${jre.version}" dir="target/build"> <include name="scripts/*.bat" 
-				/> </replace> <replace token="${BUILD_DATE}" value="${maven.build.timestamp}" 
-				dir="target/build"> <include name="scripts/*.bat" /> </replace> <replace 
-				token="${INSTALLATION_PATH}" value="${installation.path}" dir="target/build"> 
-				<include name="scripts/*.bat" /> </replace> <replace token="${INSTALLATION_SERVICE_NAME}" 
-				value="${installation.service.name}" dir="target/build"> <include name="scripts/*.bat" 
-				/> </replace> </tasks> </configuration> <goals> <goal>run</goal> </goals> 
-				</execution> </executions> </plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -118,10 +106,6 @@
 							</descriptors>
 						</configuration>
 					</execution>
-					<!-- <execution> <id>make-assembly</id> <phase>package</phase> <goals> 
-						<goal>single</goal> </goals> <configuration> <appendAssemblyId>false</appendAssemblyId> 
-						<descriptors> <descriptor>build/xml/package.xml</descriptor> </descriptors> 
-						</configuration> </execution> -->
 				</executions>
 			</plugin>
 		</plugins>
