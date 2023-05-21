@@ -127,6 +127,7 @@ public class RestoreMain {
         // Append source file name to dest file path
         destFile = new File(destFile.getAbsolutePath() + File.separator + sourceFile.getName());
 
+        prtln("Calculating data size...");
         long totalSize = FileUtil.getDirSize(sourceFile);
         progressUtil = new ProgressUtil(totalSize);
         prtln("");
