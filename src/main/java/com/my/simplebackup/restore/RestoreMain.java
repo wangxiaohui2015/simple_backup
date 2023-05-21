@@ -127,10 +127,10 @@ public class RestoreMain {
         // Append source file name to dest file path
         destFile = new File(destFile.getAbsolutePath() + File.separator + sourceFile.getName());
 
+        prtln("");
         prtln("Calculating data size...");
         long totalSize = FileUtil.getDirSize(sourceFile);
         progressUtil = new ProgressUtil(totalSize);
-        prtln("");
         prtln("Data Size: " + FileUtil.getFileSizeString(totalSize));
         prtln("");
 
@@ -140,7 +140,7 @@ public class RestoreMain {
             e.printStackTrace();
         }
 
-        prtln("Executing...");
+        prtln("Executing restore...");
         prtln("");
         long startTime = System.currentTimeMillis();
         executeRestoreTask(sourceFile, destFile, password);
