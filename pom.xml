@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.my</groupId>
@@ -6,7 +7,9 @@
 	<version>1.0.0-RELEASE</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jre.version>1.8.0_65</jre.version>
+		<jre.version>1.8</jre.version>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
 		<log4j.version>1.2.14</log4j.version>
 		<junit.version>4.12</junit.version>
 	</properties>
@@ -72,10 +75,12 @@
 							<goal>single</goal>
 						</goals>
 						<configuration>
-							<finalName>${project.artifactId}-backup-${project.version}</finalName>
+							<finalName>
+								${project.artifactId}-backup-${project.version}</finalName>
 							<archive>
 								<manifest>
-									<mainClass>com.my.simplebackup.backup.BackupMain</mainClass>
+									<mainClass>
+										com.my.simplebackup.backup.BackupMain</mainClass>
 								</manifest>
 							</archive>
 							<descriptorRefs>
@@ -94,10 +99,12 @@
 							<goal>single</goal>
 						</goals>
 						<configuration>
-							<finalName>${project.artifactId}-restore-${project.version}</finalName>
+							<finalName>
+								${project.artifactId}-restore-${project.version}</finalName>
 							<archive>
 								<manifest>
-									<mainClass>com.my.simplebackup.restore.RestoreMain</mainClass>
+									<mainClass>
+										com.my.simplebackup.restore.RestoreMain</mainClass>
 								</manifest>
 							</archive>
 							<appendAssemblyId>false</appendAssemblyId>
