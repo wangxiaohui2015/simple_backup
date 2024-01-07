@@ -10,6 +10,19 @@ import java.security.MessageDigest;
 public class HashUtil {
 
     /**
+     * Get SHA128 hash value.
+     * 
+     * @param bytes given bytes
+     * @return SHA128 hash value
+     * @throws Exception Exception
+     */
+    public static byte[] getSHA128HashValue(byte[] bytes) throws Exception {
+        MessageDigest md = MessageDigest.getInstance("SHA-1");
+        md.update(bytes);
+        return md.digest();
+    }
+
+    /**
      * Get SHA256 hash value.
      * 
      * @param bytes given bytes

@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
@@ -28,21 +29,22 @@ public class FileDecryptor {
     private static final int CACHE_SIZE = 1024 * 1024;
     private static final String CHARSET_UTF8 = "UTF-8";
     private static byte[] keyBytes;
+    private static byte[] ivBytes;
 
     /**
-     * Init keyBytes.
+     * Initialize keyBytes and ivBytes.
      * 
      * @param key Security key
      * @throws Exception Exception
      */
     private static void initKeyBytes(String key) throws Exception {
-        if (keyBytes != null) {
-            return;
+        if (null == keyBytes) {
+            keyBytes = HashUtil.getSHA256HashValue(key.getBytes(CHARSET_UTF8));
         }
-        keyBytes = HashUtil.getSHA256HashValue(key.getBytes(CHARSET_UTF8));
-        String keyHashString = HashUtil.getSHA256HashStringValue(keyBytes);
-        keyBytes = HashUtil.getSHA256HashValue(keyHashString.getBytes(CHARSET_UTF8));
-        keyBytes = HashUtil.getSHA256HashValue(keyBytes);
+        if (null == ivBytes) {
+            byte[] sha1Bytes = HashUtil.getSHA128HashValue(key.getBytes(CHARSET_UTF8));
+            ivBytes = Arrays.copyOf(sha1Bytes, 16);
+        }
     }
 
     /**
@@ -75,8 +77,8 @@ public class FileDecryptor {
                 in = new FileInputStream(sourceFile);
                 out = new FileOutputStream(destFile);
 
-                SecretKeySpec secretKeySpec = new SecretKeySpec(keyBytes, 0, 16, ALGORITHM);
-                IvParameterSpec ivParameterSpec = new IvParameterSpec(keyBytes, 16, 16);
+                SecretKeySpec secretKeySpec = new SecretKeySpec(keyBytes, ALGORITHM);
+                IvParameterSpec ivParameterSpec = new IvParameterSpec(ivBytes);
                 Cipher cipher = Cipher.getInstance(ALGORITHM_PKCS5PADDING);
                 cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
                 cout = new CipherOutputStream(out, cipher);

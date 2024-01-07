@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -14,12 +15,12 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.log4j.Logger;
 
+import com.my.simplebackup.backup.util.ServiceConfigPropertiesUtil;
 import com.my.simplebackup.common.FileUtil;
 import com.my.simplebackup.common.HashUtil;
-import com.my.simplebackup.backup.util.ServiceConfigPropertiesUtil;
 
 /**
- * File encryptor, use AES algorithm to encrypt file.
+ * File encryptor, use AES256 algorithm to encrypt file.
  * 
  * @author Administrator
  */
@@ -32,14 +33,14 @@ public class FileEncryptor {
     private static final int CACHE_SIZE = 1024 * 1024;
     private static final String CHARSET_UTF8 = "UTF-8";
     private static byte[] keyBytes;
+    private static byte[] ivBytes;
 
     static {
         try {
             String key = ServiceConfigPropertiesUtil.getInstance().getBackupKey();
             keyBytes = HashUtil.getSHA256HashValue(key.getBytes(CHARSET_UTF8));
-            String keyHashString = HashUtil.getSHA256HashStringValue(keyBytes);
-            keyBytes = HashUtil.getSHA256HashValue(keyHashString.getBytes(CHARSET_UTF8));
-            keyBytes = HashUtil.getSHA256HashValue(keyBytes);
+            byte[] sha1Bytes = HashUtil.getSHA128HashValue(key.getBytes(CHARSET_UTF8));
+            ivBytes = Arrays.copyOf(sha1Bytes, 16);
         } catch (Exception e) {
             logger.error("Failed to init key bytes.", e);
             System.exit(-1);
@@ -77,8 +78,8 @@ public class FileEncryptor {
             in = new FileInputStream(sourceFile);
             out = new FileOutputStream(destFile);
 
-            SecretKeySpec secretKeySpec = new SecretKeySpec(keyBytes, 0, 16, ALGORITHM);
-            IvParameterSpec ivParameterSpec = new IvParameterSpec(keyBytes, 16, 16);
+            SecretKeySpec secretKeySpec = new SecretKeySpec(keyBytes, ALGORITHM);
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivBytes);
             Cipher cipher = Cipher.getInstance(ALGORITHM_PKCS5PADDING);
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
             cin = new CipherInputStream(in, cipher);

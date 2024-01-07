@@ -15,7 +15,7 @@ import com.my.simplebackup.common.FileUtil;
  */
 public class BackupMain {
 
-    private static Logger logger = Logger.getLogger(BackupMain.class);
+    private static Logger logger;
 
     // Root directory, need to specify it in VM argument like this:
     // -DrootDir=/home/sunny/work/tmp/root_dir
@@ -112,7 +112,7 @@ public class BackupMain {
                     FileEncryptionExecutor.getInstance()
                                     .submitTask(new FileEncryptionThread(file.getAbsolutePath(),
                                                     newDestFile.getAbsolutePath(), controller),
-                                    controller);
+                                                    controller);
                 } else {
                     // ... Check if this file is changed or not.
                 }
@@ -128,10 +128,15 @@ public class BackupMain {
 
     private static void init(String[] args) {
         rootDir = System.getProperty("rootDir");
-        if (null == rootDir || "".equals(rootDir)) {
-            String errorInfo = "Cannot find environment var: rootDir, system exits.";
-            logger.error(errorInfo);
+        if (null == rootDir || "".equals(rootDir) || !new File(rootDir).isDirectory()) {
+            String errorInfo = "ERROR: rootDir is not set or not exist, system exits.";
             System.out.println(errorInfo);
+            System.exit(-1);
+        }
+        try {
+            logger = Logger.getLogger(BackupMain.class);
+        } catch (Exception e) {
+            logger.error("Failed to initialize system.", e);
             System.exit(-1);
         }
     }
