@@ -38,12 +38,13 @@ public class FileDecryptor {
      * @throws Exception Exception
      */
     private static void initKeyBytes(String key) throws Exception {
-        if (null == keyBytes) {
-            keyBytes = HashUtil.getSHA256HashValue(key.getBytes(CHARSET_UTF8));
-        }
-        if (null == ivBytes) {
-            byte[] sha1Bytes = HashUtil.getSHA128HashValue(key.getBytes(CHARSET_UTF8));
-            ivBytes = Arrays.copyOf(sha1Bytes, 16);
+        if (null == keyBytes || null == ivBytes) {
+            String keyStr = key;
+            byte[] keyStrBytes = HashUtil.getSHA512Hash(keyStr.getBytes(CHARSET_UTF8));
+            keyStr = HashUtil.convertBytesToHexStr(keyStrBytes);
+            keyStrBytes = HashUtil.getSHA512Hash(keyStr.getBytes(CHARSET_UTF8));
+            keyBytes = Arrays.copyOfRange(keyStrBytes, 0, 32);
+            ivBytes = Arrays.copyOfRange(keyStrBytes, 32, 48);
         }
     }
 

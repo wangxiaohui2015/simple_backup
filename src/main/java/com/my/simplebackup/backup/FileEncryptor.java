@@ -37,10 +37,12 @@ public class FileEncryptor {
 
     static {
         try {
-            String key = ServiceConfigPropertiesUtil.getInstance().getBackupKey();
-            keyBytes = HashUtil.getSHA256HashValue(key.getBytes(CHARSET_UTF8));
-            byte[] sha1Bytes = HashUtil.getSHA128HashValue(key.getBytes(CHARSET_UTF8));
-            ivBytes = Arrays.copyOf(sha1Bytes, 16);
+            String keyStr = ServiceConfigPropertiesUtil.getInstance().getBackupKey();
+            byte[] keyStrBytes = HashUtil.getSHA512Hash(keyStr.getBytes(CHARSET_UTF8));
+            keyStr = HashUtil.convertBytesToHexStr(keyStrBytes);
+            keyStrBytes = HashUtil.getSHA512Hash(keyStr.getBytes(CHARSET_UTF8));
+            keyBytes = Arrays.copyOfRange(keyStrBytes, 0, 32);
+            ivBytes = Arrays.copyOfRange(keyStrBytes, 32, 48);
         } catch (Exception e) {
             logger.error("Failed to init key bytes.", e);
             System.exit(-1);
