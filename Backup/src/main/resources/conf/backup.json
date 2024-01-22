@@ -3,8 +3,8 @@
     "key": "changeme",
     "backups": [
         {
-            "src": "C:\\D\\tmp\\src\\",
-            "dest": "C:\\D\\tmp\\dest\\"
+            "src": "",
+            "dest": ""
         }
     ]
 }
