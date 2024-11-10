@@ -39,11 +39,11 @@ public class BackupMain {
             logger.info("Begin to execute backup task.");
             executeBackupTask();
             this.taskController.await();
-            logger.info("End to execute backup task.");
         } catch (Throwable e) {
             logger.error("Exception occurred while executing backup task.", e);
         } finally {
             this.executor.shutDownExecutorService();
+            logger.info("End to execute backup task.");
         }
     }
 
