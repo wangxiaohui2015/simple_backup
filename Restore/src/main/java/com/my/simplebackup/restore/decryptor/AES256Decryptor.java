@@ -12,7 +12,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import com.my.simplebackup.common.FileUtil;
 import com.my.simplebackup.common.NumUtil;
-import com.my.simplebackup.restore.MetaDataDecryptRet;
+import com.my.simplebackup.restore.MetadataDecryptRet;
 
 /**
  * Use AES256 algorithm to decrypt file.
@@ -37,10 +37,10 @@ public class AES256Decryptor {
      * Decrypt meta data.
      * 
      * @param filePath file path
-     * @return MetaDataDecryptRet object
+     * @return MetadataDecryptRet object
      * @throws Exception Exception
      */
-    public MetaDataDecryptRet decryptMetaData(String filePath) throws Exception {
+    public MetadataDecryptRet decryptMetadata(String filePath) throws Exception {
         File file = new File(filePath);
         if (!file.exists()) {
             throw new Exception("File doesn't exist: " + filePath);
@@ -51,25 +51,26 @@ public class AES256Decryptor {
             // Metadata length, 4 bytes
             byte[] lenBytes = new byte[META_DATA_BYTES_LEN];
             rf.read(lenBytes);
-            int metaDataLen = NumUtil.bytesToInt(lenBytes);
+            int metadataLen = NumUtil.bytesToInt(lenBytes);
 
             // Metadata checksum, 32 bytes
-            byte[] metaDataHashBytes = new byte[META_DATA_HASH_BYTES_LEN];
-            rf.read(metaDataHashBytes);
+            byte[] metadataHashBytes = new byte[META_DATA_HASH_BYTES_LEN];
+            rf.read(metadataHashBytes);
 
-            byte[] encryptedMetaDataBytes = new byte[metaDataLen];
-            rf.read(encryptedMetaDataBytes);
+            byte[] encryptedMetadataBytes = new byte[metadataLen];
+            rf.read(encryptedMetadataBytes);
 
             SecretKeySpec secretKeySpec = new SecretKeySpec(keyBytes, 0, 32, ALGORITHM);
             IvParameterSpec ivParameterSpec = new IvParameterSpec(ivBytes, 0, 16);
             Cipher cipher = Cipher.getInstance(ALGORITHM_PKCS5PADDING);
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
-            byte[] metaDataBytes = cipher.doFinal(encryptedMetaDataBytes);
+            byte[] metadataBytes = cipher.doFinal(encryptedMetadataBytes);
 
             // Calculate metadata encrypt length
-            int metaDataEncryptLen = META_DATA_BYTES_LEN + META_DATA_HASH_BYTES_LEN + metaDataLen;
+            int metadataEncryptLen = META_DATA_BYTES_LEN + META_DATA_HASH_BYTES_LEN + metadataLen;
 
-            MetaDataDecryptRet ret = new MetaDataDecryptRet(metaDataEncryptLen, metaDataBytes, metaDataHashBytes);
+            MetadataDecryptRet ret = new MetadataDecryptRet(metadataEncryptLen, metadataBytes,
+                            metadataHashBytes);
             return ret;
         } catch (Exception e) {
             throw e;
@@ -79,16 +80,17 @@ public class AES256Decryptor {
     /**
      * Decrypt file.
      * 
-     * @param srcFilePath  Source file path
+     * @param srcFilePath Source file path
      * @param destFilePath Destination file path
-     * @param seek         Seek number
+     * @param seek Seek number
      * @throws Exception Exception
      */
     public void decryptFile(String srcFilePath, String destFilePath, long seek) throws Exception {
         File srcFile = new File(srcFilePath);
         File destFile = new File(destFilePath);
         if (!srcFile.exists() || !srcFile.isFile()) {
-            throw new Exception("sourceFile doesn't exist or sourceFile isn't a file, sourceFile:" + srcFile);
+            throw new Exception("sourceFile doesn't exist or sourceFile isn't a file, sourceFile:"
+                            + srcFile);
         }
         if (!destFile.getParentFile().exists()) {
             destFile.getParentFile().mkdirs();

@@ -44,8 +44,7 @@ public class BackupTaskController {
     }
 
     /**
-     * Invoke this method after submit all tasks, and wait for all tasks are
-     * finished.
+     * Invoke this method after submit all tasks, and wait for all tasks are finished.
      */
     public void await() {
         lock.lock();

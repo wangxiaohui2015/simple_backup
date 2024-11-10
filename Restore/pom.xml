@@ -50,9 +50,6 @@
                                 </manifest>
                             </archive>
                             <outputDirectory>${basedir}/target/release</outputDirectory>
-                            <descriptors>
-                                <descriptor>mvn/xml/jar-restore.xml</descriptor>
-                            </descriptors>
                             <descriptorRefs>
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
                             </descriptorRefs>

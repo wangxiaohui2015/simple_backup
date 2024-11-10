@@ -1,51 +1,34 @@
 package com.my.simplebackup.backup.record;
 
-import java.util.Objects;
-
 /**
  * Record item.
  */
 public class RecordItem {
+    private String srcBasePath;
     private String srcFullPath;
-    private String srcBaseDir;
+    private String destBasePath;
     private String destFullPath;
-    private String destBaseDir;
     private long lastModifyTime;
-    private long backupTime;
+    private long backupStartTime;
+    private long backupFinishTime;
     private boolean isBackupSucceed;
 
-    public RecordItem() {
-    }
+    public RecordItem() {}
 
-    public RecordItem(String srcFullPath, String srcBaseDir, String destFullPath, String destBaseDir,
-            long lastModifyTime, long backupTime, boolean isBackupSucceed) {
+    public RecordItem(String srcBasePath, String srcFullPath, String destBaseDir,
+                    String destFullPath) {
+        this.srcBasePath = srcBasePath;
         this.srcFullPath = srcFullPath;
-        this.srcBaseDir = srcBaseDir;
+        this.destBasePath = destBaseDir;
         this.destFullPath = destFullPath;
-        this.destBaseDir = destBaseDir;
-        this.backupTime = backupTime;
-        this.lastModifyTime = lastModifyTime;
-        this.isBackupSucceed = isBackupSucceed;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(srcFullPath);
+    public String getSrcBasePath() {
+        return srcBasePath;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        RecordItem other = (RecordItem) obj;
-        return Objects.equals(srcFullPath, other.srcFullPath);
+    public void setSrcBasePath(String srcBasePath) {
+        this.srcBasePath = srcBasePath;
     }
 
     public String getSrcFullPath() {
@@ -56,12 +39,12 @@ public class RecordItem {
         this.srcFullPath = srcFullPath;
     }
 
-    public String getSrcBaseDir() {
-        return srcBaseDir;
+    public String getDestBasePath() {
+        return destBasePath;
     }
 
-    public void setSrcBaseDir(String srcBaseDir) {
-        this.srcBaseDir = srcBaseDir;
+    public void setDestBasePath(String destBasePath) {
+        this.destBasePath = destBasePath;
     }
 
     public String getDestFullPath() {
@@ -72,14 +55,6 @@ public class RecordItem {
         this.destFullPath = destFullPath;
     }
 
-    public String getDestBaseDir() {
-        return destBaseDir;
-    }
-
-    public void setDestBaseDir(String destBaseDir) {
-        this.destBaseDir = destBaseDir;
-    }
-
     public long getLastModifyTime() {
         return lastModifyTime;
     }
@@ -88,12 +63,20 @@ public class RecordItem {
         this.lastModifyTime = lastModifyTime;
     }
 
-    public long getBackupTime() {
-        return backupTime;
+    public long getBackupStartTime() {
+        return backupStartTime;
     }
 
-    public void setBackupTime(long backupTime) {
-        this.backupTime = backupTime;
+    public void setBackupStartTime(long backupStartTime) {
+        this.backupStartTime = backupStartTime;
+    }
+
+    public long getBackupFinishTime() {
+        return backupFinishTime;
+    }
+
+    public void setBackupFinishTime(long backupFinishTime) {
+        this.backupFinishTime = backupFinishTime;
     }
 
     public boolean isBackupSucceed() {

@@ -14,7 +14,7 @@ public class KeyUtil {
      * @return Metadata key bytes.
      * @throws Exception Exception
      */
-    public static byte[] getMetaDataKeyBytes(String rootKey) throws Exception {
+    public static byte[] getMetadataKeyBytes(String rootKey) throws Exception {
         byte[] metaDataKeyRootBytes = getMetaDataRootKeyBytes(rootKey);
         return Arrays.copyOfRange(metaDataKeyRootBytes, 0, 32);
     }
@@ -26,7 +26,7 @@ public class KeyUtil {
      * @return Metadata IV bytes
      * @throws Exception Exception
      */
-    public static byte[] getMetaDataIVBytes(String rootKey) throws Exception {
+    public static byte[] getMetadataIVBytes(String rootKey) throws Exception {
         byte[] metaDataKeyRootBytes = getMetaDataRootKeyBytes(rootKey);
         return Arrays.copyOfRange(metaDataKeyRootBytes, 32, 48);
     }

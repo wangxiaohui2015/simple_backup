@@ -10,8 +10,8 @@ public class ProgressUtil {
     /**
      * Constructor method.
      * 
-     * @param totalPoints total points, in general, we need to pass the size of a
-     *                    file or a directory.
+     * @param totalPoints total points, in general, we need to pass the size of a file or a
+     *        directory.
      */
     public ProgressUtil(long totalPoints) {
         super();
@@ -23,9 +23,9 @@ public class ProgressUtil {
      * 
      * @param incressedPoint Incress point
      */
-    public int getProgress(long incressedPoint) {
+    public double getProgress(long incressedPoint) {
         incressedPoints += incressedPoint;
-        int percentage = (int) ((incressedPoints * 1.0 / totalPoints) * 100);
+        double percentage = (incressedPoints * 1.0 / totalPoints) * 100;
         return percentage;
     }
 }

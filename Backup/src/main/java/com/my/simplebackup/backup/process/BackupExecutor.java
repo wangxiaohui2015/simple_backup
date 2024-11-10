@@ -25,16 +25,17 @@ public class BackupExecutor {
     /**
      * Submit a backup task.
      * 
-     * @param task       backup task
+     * @param task backup task
      * @param controller BackupTaskController
      * @return Future<RecordItem>
      */
-    public Future<RecordItem> submitTask(Callable<RecordItem> task, BackupTaskController controller) {
+    public Future<RecordItem> submitTask(Callable<RecordItem> task,
+                    BackupTaskController controller) {
         if (!service.isShutdown()) {
             controller.addTask();
             return service.submit(task);
         } else {
-            logger.warn("FileEncryptionExecutor is shutdown, cann't accept task.");
+            logger.warn("Backup executor is shutdown, cann't accept task.");
         }
         return null;
     }
@@ -44,13 +45,13 @@ public class BackupExecutor {
      * 
      */
     public void shutDownExecutorService() {
-        logger.info("Shutting down FileEncryptionExecutor...");
+        logger.info("Shutting down backup executor...");
         try {
             service.shutdown();
             service.awaitTermination(60 * 10, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            logger.error("InterruptedException occurred when shutDownExecutorService.", e);
+            logger.error("InterruptedException occurred when shutting dowm backup executor.", e);
         }
-        logger.info("Shut down FileEncryptionExecutor.");
+        logger.info("Shut down backup executor successfully.");
     }
 }

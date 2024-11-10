@@ -1,20 +1,19 @@
 package com.my.simplebackup.backup.process;
 
-import java.io.File;
+import java.util.Date;
 import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
 
 import com.my.simplebackup.backup.encryptor.AES256Encryptor;
-import com.my.simplebackup.backup.index.IndexFile;
 import com.my.simplebackup.backup.record.RecordItem;
 import com.my.simplebackup.common.Constants;
 import com.my.simplebackup.common.KeyUtil;
-import com.my.simplebackup.common.metadata.FileMetaData;
-import com.my.simplebackup.common.metadata.FileMetaDataHelper;
+import com.my.simplebackup.common.metadata.FileMetadata;
+import com.my.simplebackup.common.metadata.FileMetadataHelper;
 
 /**
- * File encryption thread.
+ * Backup task thread.
  */
 public class BackupTaskThread implements Callable<RecordItem> {
 
@@ -22,49 +21,50 @@ public class BackupTaskThread implements Callable<RecordItem> {
 
     private String key;
     private RecordItem recordItem;
-    private IndexFile indexFile;
-    private BackupTaskController controller;
+    private BackupTaskController taskController;
 
-    public BackupTaskThread(String key, RecordItem recordItem, IndexFile indexFile, BackupTaskController controller) {
+    public BackupTaskThread(String key, RecordItem recordItem,
+                    BackupTaskController taskController) {
         this.key = key;
         this.recordItem = recordItem;
-        this.indexFile = indexFile;
-        this.controller = controller;
+        this.taskController = taskController;
     }
 
     @Override
     public RecordItem call() throws Exception {
         try {
-            // Prepare meta data
-            FileMetaData metaData = FileMetaDataHelper.generateFileMetaData(this.recordItem.getSrcFullPath(),
-                    this.recordItem.getSrcBaseDir());
-            String metaDataJSON = FileMetaDataHelper.getFileMetaDataJSON(metaData);
+            // Prepare metadata
+            FileMetadata metadata = FileMetadataHelper.generateFileMetadata(
+                            this.recordItem.getSrcBasePath(), this.recordItem.getSrcFullPath());
+            String metaDataJSON = FileMetadataHelper.getFileMetadataJSON(metadata);
             byte[] metaDataBytes = metaDataJSON.getBytes(Constants.UTF_8);
 
-            // Encrypt meta data
-            byte[] metaDataKeyBytes = KeyUtil.getMetaDataKeyBytes(this.key);
-            byte[] metaDataIVBytes = KeyUtil.getMetaDataIVBytes(this.key);
-            String destPath = new File(this.recordItem.getDestBaseDir() + File.separator + this.indexFile.getFilePath())
-                    .getAbsolutePath();
-            AES256Encryptor metaDataEncryptor = new AES256Encryptor(metaDataKeyBytes, metaDataIVBytes);
-            metaDataEncryptor.encryptMetaData(metaDataBytes, destPath);
+            // Encrypt metadata
+            byte[] metaDataKeyBytes = KeyUtil.getMetadataKeyBytes(this.key);
+            byte[] metaDataIVBytes = KeyUtil.getMetadataIVBytes(this.key);
+            AES256Encryptor metaDataEncryptor =
+                            new AES256Encryptor(metaDataKeyBytes, metaDataIVBytes);
+            metaDataEncryptor.encryptMetadata(metaDataBytes, this.recordItem.getDestFullPath());
 
             // Encrypt file
-            byte[] fileKeyBytes = KeyUtil.getFileKeyBytes(this.key, metaData.getKeySalt());
-            byte[] fileIVBytes = KeyUtil.getFileIVBytes(metaData.getAesIV());
+            byte[] fileKeyBytes = KeyUtil.getFileKeyBytes(this.key, metadata.getKeySalt());
+            byte[] fileIVBytes = KeyUtil.getFileIVBytes(metadata.getAesIV());
             AES256Encryptor fileEncryptor = new AES256Encryptor(fileKeyBytes, fileIVBytes);
-            fileEncryptor.encryptFile(this.recordItem.getSrcFullPath(), destPath);
+            fileEncryptor.encryptFile(this.recordItem.getSrcFullPath(),
+                            this.recordItem.getDestFullPath());
 
             // Update record item
-            this.recordItem.setDestFullPath(destPath);
-            this.recordItem.setBackupTime(metaData.getBackupTime());
+            this.recordItem.setBackupStartTime(metadata.getBackupTime());
+            this.recordItem.setBackupFinishTime(new Date().getTime());
             this.recordItem.setBackupSucceed(true);
-            logger.info("Backup succeed, src path: " + this.recordItem.getSrcFullPath() + ", dest path: " + destPath);
+            logger.info("Backup succeed, src path: " + this.recordItem.getSrcFullPath()
+                            + ", dest path: " + this.recordItem.getDestFullPath());
         } catch (Exception e) {
-            logger.error("Backup failed, source: " + this.recordItem.getSrcFullPath(), e);
+            logger.info("Backup failed, src path: " + this.recordItem.getSrcFullPath()
+                            + ", dest path: " + this.recordItem.getDestFullPath(), e);
             this.recordItem.setBackupSucceed(false);
         } finally {
-            controller.finishTask();
+            taskController.finishTask();
         }
         return this.recordItem;
     }

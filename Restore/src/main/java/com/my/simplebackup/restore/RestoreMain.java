@@ -84,8 +84,7 @@ public class RestoreMain {
         long endTime = System.currentTimeMillis();
         String timeTakenStr = TimeUtil.calculateElapsedTime(startTime, endTime);
         prtln("");
-        prtln("");
-        prtln("Time taken: " + timeTakenStr);
+        prtln("Finished, time taken: " + timeTakenStr);
         prtln("");
     }
 
@@ -133,10 +132,11 @@ public class RestoreMain {
             if (file.isFile()) {
                 try {
                     RestoreService.restoreFile(file, destBaseDir, key);
-                    int percentage = progressUtil.getProgress(file.length());
-                    prt("Completed " + percentage + "%. \r");
+                    double percentage = progressUtil.getProgress(file.length());
+                    String percentageStr = String.format("%.2f", percentage);
+                    prt("Completed " + percentageStr + "%. \r");
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    //e.printStackTrace();
                 }
             } else {
                 executeRestoreTask(file, destBaseDir, key);

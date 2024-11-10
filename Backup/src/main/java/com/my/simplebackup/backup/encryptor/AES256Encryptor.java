@@ -38,16 +38,18 @@ public class AES256Encryptor {
     }
 
     /**
-     * Encrypt meta data.
+     * Encrypt metadata.
      * 
-     * Data format: EncryptedMetaDataLen(4 Bytes) + OriMetaDataHash(32 Bytes) +
-     * EncryptedMetaData
+     * Data format: EncryptedMetadataBytesLen(4 Bytes) + OriMetadataHash(32 Bytes) +
+     * EncryptedMetadataBytes
      * 
-     * @param bytes        meta data bytes
+     * @param bytes metadata bytes
      * @param destFilePath destination file path
      * @throws Exception Exception
      */
-    public void encryptMetaData(byte[] bytes, String destFilePath) throws Exception {
+    public void encryptMetadata(byte[] bytes, String destFilePath) throws Exception {
+
+        // Check parent directories
         File destFile = new File(destFilePath);
         if (!destFile.getParentFile().exists()) {
             destFile.getParentFile().mkdirs();
@@ -59,28 +61,28 @@ public class AES256Encryptor {
         try (OutputStream out = new FileOutputStream(destFile)) {
 
             // Metadata Hash SHA256
-            byte[] metaDataHash = HashUtil.getSHA256Hash(bytes);
+            byte[] metadataHash = HashUtil.getSHA256Hash(bytes);
 
             // Encrypt metadata
             SecretKeySpec secretKeySpec = new SecretKeySpec(keyBytes, 0, 32, ALGORITHM);
             IvParameterSpec ivParameterSpec = new IvParameterSpec(ivBytes, 0, 16);
             Cipher cipher = Cipher.getInstance(ALGORITHM_PKCS5PADDING);
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
-            byte[] encryptedMetaDataBytes = cipher.doFinal(bytes);
+            byte[] encryptedMetadataBytes = cipher.doFinal(bytes);
 
             // Write metadata length, will use 4 bytes
-            int metaDataLen = encryptedMetaDataBytes.length;
-            byte[] metaDataLenBytes = NumUtil.intToByte(metaDataLen);
-            out.write(metaDataLenBytes);
+            int metadataLen = encryptedMetadataBytes.length;
+            byte[] metadataLenBytes = NumUtil.intToByte(metadataLen);
+            out.write(metadataLenBytes);
 
-            // Write meta data HASH, will use 32 bytes
-            out.write(metaDataHash);
+            // Write metadata HASH, will use 32 bytes
+            out.write(metadataHash);
 
             // Write encrypted metadata
-            out.write(encryptedMetaDataBytes);
+            out.write(encryptedMetadataBytes);
             out.flush();
         } catch (Exception e) {
-            logger.error("Exception occurred when encryptMetaData.", e);
+            logger.error("Exception occurred whiling encrypting metadata.", e);
             throw e;
         }
     }
@@ -89,21 +91,20 @@ public class AES256Encryptor {
      * Encrypt file.
      * 
      * @param sourceFilePath source file path
-     * @param destFilePath   destination file path
+     * @param destFilePath destination file path
      * @throws Exception Exception
      */
     public void encryptFile(String sourceFilePath, String destFilePath) throws Exception {
-        File sourceFile = new File(sourceFilePath);
+
+        // Check parent directories
         File destFile = new File(destFilePath);
-        if (!sourceFile.exists() || !sourceFile.isFile()) {
-            throw new Exception("sourceFile doesn't exist or sourceFile isn't a file, sourceFile:" + sourceFile);
-        }
         if (!destFile.getParentFile().exists()) {
             destFile.getParentFile().mkdirs();
         }
         if (!destFile.exists()) {
             destFile.createNewFile();
         }
+
         InputStream in = null;
         CipherInputStream cin = null;
         RandomAccessFile rFile = null;
@@ -113,9 +114,11 @@ public class AES256Encryptor {
             Cipher cipher = Cipher.getInstance(ALGORITHM_PKCS5PADDING);
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
 
-            in = new FileInputStream(sourceFile);
+            // Seek to the end of destination file.
             rFile = new RandomAccessFile(destFile, "rw");
-            rFile.seek(destFile.length()); // Seek to the end of dest file.
+            rFile.seek(destFile.length());
+
+            in = new FileInputStream(sourceFilePath);
             cin = new CipherInputStream(in, cipher);
 
             byte[] bytes = new byte[CACHE_SIZE];
@@ -124,7 +127,7 @@ public class AES256Encryptor {
                 rFile.write(bytes, 0, length);
             }
         } catch (Exception e) {
-            logger.error("Exception occurred when encryptFile.", e);
+            logger.error("Exception occurred while encrypting file.", e);
             throw e;
         } finally {
             FileUtil.closeRandomAccessFile(rFile);

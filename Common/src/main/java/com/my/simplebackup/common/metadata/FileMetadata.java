@@ -3,7 +3,7 @@ package com.my.simplebackup.common.metadata;
 /**
  * File meta data.
  */
-public class FileMetaData {
+public class FileMetadata {
 
     private String fileName = "";
     private String fileBasePath = "";
