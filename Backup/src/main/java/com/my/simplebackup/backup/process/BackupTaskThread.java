@@ -1,5 +1,6 @@
 package com.my.simplebackup.backup.process;
 
+import java.io.File;
 import java.util.Date;
 import java.util.concurrent.Callable;
 
@@ -53,6 +54,7 @@ public class BackupTaskThread implements Callable<RecordItem> {
             // Update record item
             this.recordItem.setBackupStartTime(metadata.getBackupTime());
             this.recordItem.setBackupFinishTime(new Date().getTime());
+            this.recordItem.setDestFileSize(new File(this.recordItem.getDestFullPath()).length());
             this.recordItem.setBackupSucceed(true);
             logger.info("Backup succeed, src path: " + this.recordItem.getSrcFullPath() + ", dest path: "
                     + this.recordItem.getDestFullPath());

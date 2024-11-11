@@ -1,10 +1,16 @@
 
 package com.my.simplebackup.common;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 /**
  * Time utility.
  */
 public class TimeUtil {
+
+    private static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 
     private static final long HOUR = 60 * 60 * 1000L;
     private static final long MINUTE = 60 * 1000L;
@@ -35,14 +41,22 @@ public class TimeUtil {
             sb.append(minutes + " minutes, ");
         }
         if (seconds == 1) {
-            sb.append(seconds + " second.");
+            sb.append(seconds + " second");
         } else if (seconds > 1) {
-            sb.append(seconds + " seconds.");
+            sb.append(seconds + " seconds");
         }
 
         if ("".equals(sb.toString())) {
-            sb.append("0 second.");
+            sb.append("0 second");
         }
         return sb.toString();
+    }
+
+    public static Date parseStrToDate(String str) throws Exception {
+        return format.parse(str);
+    }
+
+    public static String parseDateToStr(Date date) {
+        return format.format(date);
     }
 }

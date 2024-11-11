@@ -53,6 +53,5 @@ public class BackupExecutor {
         } catch (InterruptedException e) {
             logger.error("InterruptedException occurred when shutting dowm backup executor.", e);
         }
-        logger.info("Shut down backup executor successfully.");
     }
 }

@@ -129,12 +129,11 @@ public class FileUtil {
             sb.append(b + "B, ");
         }
         String str = sb.toString();
-        str = str.substring(0, str.length() - 2);
+        if (str.length() > 2) {
+            str = str.substring(0, str.length() - 2);
+        } else {
+            str = "0B";
+        }
         return str;
-    }
-
-    public static void main(String[] args) {
-        long fileSize = 1234238954732L;
-        System.out.println(getFileSizeString(fileSize));
     }
 }

@@ -1,6 +1,7 @@
 package com.my.simplebackup.backup;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -11,10 +12,12 @@ import com.my.simplebackup.backup.process.BackupExecutor;
 import com.my.simplebackup.backup.process.BackupTaskController;
 import com.my.simplebackup.backup.process.BackupTaskThread;
 import com.my.simplebackup.backup.record.RecordItem;
+import com.my.simplebackup.backup.statistics.BackupStatisticsHelper;
 import com.my.simplebackup.common.Constants;
 import com.my.simplebackup.common.FileUtil;
 import com.my.simplebackup.common.HashUtil;
 import com.my.simplebackup.common.StringUtil;
+import com.my.simplebackup.common.statistics.StatisticsEntity;
 
 /**
  * The main entry of backup.
@@ -26,6 +29,8 @@ public class BackupMain {
     private BackupTaskController taskController;
     private BackupConfigManager configManager;
     private BackupExecutor executor;
+    private StatisticsEntity statEntity;
+    private List<RecordItem> recordItems;
 
     public static void main(String[] args) {
         new BackupMain(args).startBackup();
@@ -38,12 +43,16 @@ public class BackupMain {
     private void startBackup() {
         try {
             logger.info("Begin to execute backup task.");
+            statEntity.startStat();
             executeBackupTask();
             this.taskController.await();
         } catch (Throwable e) {
             logger.error("Exception occurred while executing backup task.", e);
         } finally {
             this.executor.shutDownExecutorService();
+            statEntity.endStat();
+            BackupStatisticsHelper.statsBackupResults(this.statEntity, this.recordItems);
+            BackupStatisticsHelper.showStatInformation(this.statEntity);
             logger.info("End to execute backup task.");
         }
     }
@@ -100,9 +109,11 @@ public class BackupMain {
                 if (new File(destFullPath).exists()) {
                     continue;
                 }
-                RecordItem recordItem = new RecordItem(srcBaseDir, srcFullPath, destBaseDir, destFullPath);
+                RecordItem recordItem = new RecordItem(srcBaseDir, srcFullPath, destBaseDir, destFullPath,
+                        file.length());
                 BackupTaskThread task = new BackupTaskThread(this.configManager.getBackupConfig().getKeyBytes(),
                         recordItem, this.taskController);
+                recordItems.add(recordItem);
                 this.executor.submitTask(task, this.taskController);
             } else {
                 processBackupTask(srcBaseDir, file.getAbsolutePath(), destBaseDir);
@@ -136,6 +147,8 @@ public class BackupMain {
             this.taskController = new BackupTaskController();
             this.configManager = new BackupConfigManager(rootDir);
             this.executor = new BackupExecutor(this.configManager.getBackupConfig().getThread());
+            this.statEntity = new StatisticsEntity();
+            this.recordItems = new ArrayList<RecordItem>();
         } catch (Exception e) {
             logger.error("Failed to initialize system.", e);
             System.exit(-1);

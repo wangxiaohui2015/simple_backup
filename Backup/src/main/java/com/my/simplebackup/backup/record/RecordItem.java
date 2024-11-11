@@ -8,19 +8,23 @@ public class RecordItem {
     private String srcFullPath;
     private String destBasePath;
     private String destFullPath;
+    private long srcFileSize;
+    private long destFileSize;
     private long lastModifyTime;
     private long backupStartTime;
     private long backupFinishTime;
     private boolean isBackupSucceed;
 
-    public RecordItem() {}
+    public RecordItem() {
+    }
 
-    public RecordItem(String srcBasePath, String srcFullPath, String destBaseDir,
-                    String destFullPath) {
+    public RecordItem(String srcBasePath, String srcFullPath, String destBaseDir, String destFullPath,
+            long srcFileSize) {
         this.srcBasePath = srcBasePath;
         this.srcFullPath = srcFullPath;
         this.destBasePath = destBaseDir;
         this.destFullPath = destFullPath;
+        this.srcFileSize = srcFileSize;
     }
 
     public String getSrcBasePath() {
@@ -85,5 +89,21 @@ public class RecordItem {
 
     public void setBackupSucceed(boolean isBackupSucceed) {
         this.isBackupSucceed = isBackupSucceed;
+    }
+
+    public long getSrcFileSize() {
+        return srcFileSize;
+    }
+
+    public void setSrcFileSize(long srcFileSize) {
+        this.srcFileSize = srcFileSize;
+    }
+
+    public long getDestFileSize() {
+        return destFileSize;
+    }
+
+    public void setDestFileSize(long destFileSize) {
+        this.destFileSize = destFileSize;
     }
 }
