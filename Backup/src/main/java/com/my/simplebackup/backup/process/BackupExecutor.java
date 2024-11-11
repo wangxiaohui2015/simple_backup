@@ -16,6 +16,8 @@ import com.my.simplebackup.backup.record.RecordItem;
 public class BackupExecutor {
     private static Logger logger = Logger.getLogger(BackupExecutor.class);
 
+    private static final int SHUTDOWN_WAIT_SECONDS = 60 * 10;
+
     private ExecutorService service;
 
     public BackupExecutor(int threads) {
@@ -25,12 +27,11 @@ public class BackupExecutor {
     /**
      * Submit a backup task.
      * 
-     * @param task backup task
+     * @param task       backup task
      * @param controller BackupTaskController
      * @return Future<RecordItem>
      */
-    public Future<RecordItem> submitTask(Callable<RecordItem> task,
-                    BackupTaskController controller) {
+    public Future<RecordItem> submitTask(Callable<RecordItem> task, BackupTaskController controller) {
         if (!service.isShutdown()) {
             controller.addTask();
             return service.submit(task);
@@ -48,7 +49,7 @@ public class BackupExecutor {
         logger.info("Shutting down backup executor...");
         try {
             service.shutdown();
-            service.awaitTermination(60 * 10, TimeUnit.SECONDS);
+            service.awaitTermination(SHUTDOWN_WAIT_SECONDS, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             logger.error("InterruptedException occurred when shutting dowm backup executor.", e);
         }

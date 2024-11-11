@@ -14,6 +14,7 @@ import com.my.simplebackup.backup.record.RecordItem;
 import com.my.simplebackup.common.Constants;
 import com.my.simplebackup.common.FileUtil;
 import com.my.simplebackup.common.HashUtil;
+import com.my.simplebackup.common.StringUtil;
 
 /**
  * The main entry of backup.
@@ -27,7 +28,7 @@ public class BackupMain {
     private BackupExecutor executor;
 
     public static void main(String[] args) {
-        new BackupMain(args).startBackup();;
+        new BackupMain(args).startBackup();
     }
 
     public BackupMain(String[] args) {
@@ -52,14 +53,12 @@ public class BackupMain {
         for (BackupItem item : backupItems) {
             String srcDir = item.getSrc();
             String destDir = item.getDest();
-            if (null == srcDir || "".equals(srcDir)) {
-                logger.warn("sourceDir is null or empty, sourceDir: " + srcDir + ", destDir: "
-                                + destDir);
+            if (StringUtil.isEmpty(srcDir)) {
+                logger.warn("sourceDir is null or empty, sourceDir: " + srcDir + ", destDir: " + destDir);
                 continue;
             }
-            if (null == destDir || "".equals(destDir)) {
-                logger.warn("destDir is null or empty, sourceDir: " + srcDir + ", destDir: "
-                                + destDir);
+            if (StringUtil.isEmpty(destDir)) {
+                logger.warn("destDir is null or empty, sourceDir: " + srcDir + ", destDir: " + destDir);
                 continue;
             }
 
@@ -74,41 +73,36 @@ public class BackupMain {
                 continue;
             }
             if (FileUtil.isSubFile(srcFile, destFile)) {
-                logger.warn("Source dir is the sub dir of dest dir, or dest dir is the sub dir of source dir, skip this entry, source dir: "
+                logger.warn(
+                        "Source dir is the sub dir of dest dir, or dest dir is the sub dir of source dir, skip this entry, source dir: "
                                 + srcDir + ", dest dir: " + destDir);
                 continue;
             }
-
-            // Append source directory name to destination directory name
-            //destDir = destDir + File.separator + srcFile.getName();
 
             logger.info("Processing backup task, sourceDir: " + srcDir + ", destDir: " + destDir);
             processBackupTask(srcDir, srcDir, destDir);
         }
     }
 
-    private void processBackupTask(String srcBaseDir, String srcFullDir, String destBaseDir)
-                    throws Exception {
+    private void processBackupTask(String srcBaseDir, String srcFullDir, String destBaseDir) throws Exception {
         File sourceFile = new File(srcFullDir);
         File[] files = sourceFile.listFiles();
         if (null == files) {
-            logger.error("Files is null, cannot process backup task, source dir: " + srcFullDir);
+            logger.error("files is null, cannot process backup task, source dir: " + srcFullDir);
             return;
         }
         for (File file : files) {
             if (file.isFile()) {
                 String srcFullPath = file.getAbsolutePath();
-                String srcFullPathHash = HashUtil.convertBytesToHexStr(
-                                HashUtil.getSHA256Hash(srcFullPath.getBytes(Constants.UTF_8)));
-                String destFullDir = genDestFullDir(destBaseDir, srcFullPathHash);
-                String destFullPath = genDestFullPath(destFullDir, srcFullPathHash);
+                String srcFullPathHash = HashUtil
+                        .convertBytesToHexStr(HashUtil.getSHA256Hash(srcFullPath.getBytes(Constants.UTF_8)));
+                String destFullPath = genDestFullPath(destBaseDir, srcFullPathHash);
                 if (new File(destFullPath).exists()) {
                     continue;
                 }
-                RecordItem recordItem =
-                                new RecordItem(srcBaseDir, srcFullPath, destBaseDir, destFullPath);
-                String key = this.configManager.getBackupConfig().getKey();
-                BackupTaskThread task = new BackupTaskThread(key, recordItem, this.taskController);
+                RecordItem recordItem = new RecordItem(srcBaseDir, srcFullPath, destBaseDir, destFullPath);
+                BackupTaskThread task = new BackupTaskThread(this.configManager.getBackupConfig().getKeyBytes(),
+                        recordItem, this.taskController);
                 this.executor.submitTask(task, this.taskController);
             } else {
                 processBackupTask(srcBaseDir, file.getAbsolutePath(), destBaseDir);
@@ -116,24 +110,19 @@ public class BackupMain {
         }
     }
 
-    // Generate destination full directory based on source full path HASH
-    // Use the previous 6 characters to be the path directory.
-    private String genDestFullDir(String destBaseDir, String srcFullPathHash) {
-        String destFullDir = destBaseDir;
-        for (int i = 0; i < 6; i++) {
-            destFullDir = destFullDir + File.separator + srcFullPathHash.substring(i, i + 1);
+    private String genDestFullPath(String destBaseDir, String srcFullPathHash) {
+        // By default, use the previous 6 characters to be the path directory
+        StringBuilder sb = new StringBuilder(destBaseDir);
+        for (int i = 0; i < Constants.BACKUP_TARGET_DIR_LEN; i++) {
+            sb.append(File.separator).append(srcFullPathHash.substring(i, i + 1));
         }
-        return destFullDir;
-    }
-
-    private String genDestFullPath(String destFullDir, String srcFullPathHash) {
-        String destFullPath = destFullDir + File.separator + srcFullPathHash + ".data";
-        return destFullPath;
+        sb.append(File.separator).append(srcFullPathHash).append(Constants.BACKUP_TARGET_FILE_POST_FIX);
+        return sb.toString();
     }
 
     private void init(String[] args) {
-        String rootDir = System.getProperty("rootDir");
-        if (null == rootDir || "".equals(rootDir) || !new File(rootDir).isDirectory()) {
+        String rootDir = System.getProperty(Constants.BACKUP_MAIN_ROOT_DIR_KEY);
+        if (StringUtil.isEmpty(rootDir) || !new File(rootDir).isDirectory()) {
             System.out.println("ERROR: rootDir is not set or not exist, system exits.");
             System.exit(-1);
         }
@@ -148,7 +137,7 @@ public class BackupMain {
             this.configManager = new BackupConfigManager(rootDir);
             this.executor = new BackupExecutor(this.configManager.getBackupConfig().getThread());
         } catch (Exception e) {
-            logger.error("Failedto initialize system.", e);
+            logger.error("Failed to initialize system.", e);
             System.exit(-1);
         }
     }

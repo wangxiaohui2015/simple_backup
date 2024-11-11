@@ -25,6 +25,7 @@ public class AES256Decryptor {
     private static final int CACHE_SIZE = 1024 * 1024;
     private static final int META_DATA_BYTES_LEN = 4;
     private static final int META_DATA_HASH_BYTES_LEN = 32;
+
     private byte[] keyBytes;
     private byte[] ivBytes;
 
@@ -69,8 +70,7 @@ public class AES256Decryptor {
             // Calculate metadata encrypt length
             int metadataEncryptLen = META_DATA_BYTES_LEN + META_DATA_HASH_BYTES_LEN + metadataLen;
 
-            MetadataDecryptRet ret = new MetadataDecryptRet(metadataEncryptLen, metadataBytes,
-                            metadataHashBytes);
+            MetadataDecryptRet ret = new MetadataDecryptRet(metadataEncryptLen, metadataBytes, metadataHashBytes);
             return ret;
         } catch (Exception e) {
             throw e;
@@ -80,17 +80,16 @@ public class AES256Decryptor {
     /**
      * Decrypt file.
      * 
-     * @param srcFilePath Source file path
+     * @param srcFilePath  Source file path
      * @param destFilePath Destination file path
-     * @param seek Seek number
+     * @param seekLen      Seek length
      * @throws Exception Exception
      */
-    public void decryptFile(String srcFilePath, String destFilePath, long seek) throws Exception {
+    public void decryptFile(String srcFilePath, String destFilePath, long seekLen) throws Exception {
         File srcFile = new File(srcFilePath);
         File destFile = new File(destFilePath);
         if (!srcFile.exists() || !srcFile.isFile()) {
-            throw new Exception("sourceFile doesn't exist or sourceFile isn't a file, sourceFile:"
-                            + srcFile);
+            throw new Exception("sourceFile doesn't exist or sourceFile isn't a file, sourceFile:" + srcFile);
         }
         if (!destFile.getParentFile().exists()) {
             destFile.getParentFile().mkdirs();
@@ -108,8 +107,9 @@ public class AES256Decryptor {
             Cipher cipher = Cipher.getInstance(ALGORITHM_PKCS5PADDING);
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
 
+            // Skip metadata part
             rFile = new RandomAccessFile(srcFilePath, "rw");
-            rFile.seek(seek); // Skip metadata part.
+            rFile.seek(seekLen);
             out = new FileOutputStream(destFile);
             cout = new CipherOutputStream(out, cipher);
 

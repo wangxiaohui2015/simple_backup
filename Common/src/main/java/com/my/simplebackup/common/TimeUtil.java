@@ -6,6 +6,10 @@ package com.my.simplebackup.common;
  */
 public class TimeUtil {
 
+    private static final long HOUR = 60 * 60 * 1000L;
+    private static final long MINUTE = 60 * 1000L;
+    private static final long SECOND = 1000L;
+
     /**
      * Calculate elapsed time.
      * 
@@ -15,33 +19,29 @@ public class TimeUtil {
      */
     public static String calculateElapsedTime(long time1, long time2) {
         long timeDiff = Math.abs(time1 - time2);
-        long hours = timeDiff / (60 * 60 * 1000);
-        long minutes = (timeDiff - hours * 60 * 60 * 1000) / (60 * 1000);
-        long seconds = (timeDiff - hours * 60 * 60 * 1000 - minutes * 60 * 1000) / 1000;
+        long hours = timeDiff / HOUR;
+        long minutes = (timeDiff - hours * HOUR) / MINUTE;
+        long seconds = (timeDiff - hours * HOUR - minutes * MINUTE) / SECOND;
 
         StringBuffer sb = new StringBuffer();
         if (hours == 1) {
             sb.append(hours + " hour, ");
-        }
-        if (hours > 1) {
+        } else if (hours > 1) {
             sb.append(hours + " hours, ");
         }
-
         if (minutes == 1) {
             sb.append(minutes + " minute, ");
-        }
-        if (minutes > 1) {
+        } else if (minutes > 1) {
             sb.append(minutes + " minutes, ");
         }
-
         if (seconds == 1) {
             sb.append(seconds + " second.");
-        }
-        if (seconds > 1) {
+        } else if (seconds > 1) {
             sb.append(seconds + " seconds.");
         }
+
         if ("".equals(sb.toString())) {
-            sb.append("0 seconds.");
+            sb.append("0 second.");
         }
         return sb.toString();
     }

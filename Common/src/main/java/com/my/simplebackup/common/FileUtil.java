@@ -11,6 +11,11 @@ import java.io.RandomAccessFile;
  */
 public class FileUtil {
 
+    private static final long TB = 1024L * 1024 * 1024 * 1024;
+    private static final long GB = 1024L * 1024 * 1024;
+    private static final long MB = 1024L * 1024;
+    private static final long KB = 1024L;
+
     /**
      * Close input stream.
      * 
@@ -101,16 +106,13 @@ public class FileUtil {
      * @return String format file size
      */
     public static String getFileSizeString(long fileSize) {
+        long tb = fileSize / TB;
+        long gb = (fileSize - tb * TB) / GB;
+        long mb = (fileSize - tb * TB - gb * GB) / MB;
+        long kb = (fileSize - tb * TB - gb * GB - mb * MB) / KB;
+        long b = (fileSize - tb * TB - gb * GB - mb * MB - kb * KB);
 
-        long tb = fileSize / (1024L * 1024 * 1024 * 1024);
-        long gb = (fileSize - tb * (1024L * 1024 * 1024 * 1024)) / (1024L * 1024 * 1024);
-        long mb = (fileSize - tb * (1024L * 1024 * 1024 * 1024) - gb * 1024L * 1024 * 1024) / (1024L * 1024);
-        long kb = (fileSize - tb * (1024L * 1024 * 1024 * 1024) - gb * 1024L * 1024 * 1024 - mb * 1024L * 1024)
-                / (1024);
-        long b = (fileSize - tb * (1024L * 1024 * 1024 * 1024) - gb * 1024L * 1024 * 1024 - mb * 1024L * 1024
-                - kb * 1024);
         StringBuffer sb = new StringBuffer();
-
         if (tb != 0) {
             sb.append(tb + "TB, ");
         }
@@ -124,9 +126,15 @@ public class FileUtil {
             sb.append(kb + "KB, ");
         }
         if (b != 0) {
-            sb.append(b + "B");
+            sb.append(b + "B, ");
         }
+        String str = sb.toString();
+        str = str.substring(0, str.length() - 2);
+        return str;
+    }
 
-        return sb.toString();
+    public static void main(String[] args) {
+        long fileSize = 1234238954732L;
+        System.out.println(getFileSizeString(fileSize));
     }
 }

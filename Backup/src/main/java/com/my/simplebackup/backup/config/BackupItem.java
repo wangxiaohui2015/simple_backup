@@ -7,7 +7,8 @@ public class BackupItem {
     private String src;
     private String dest;
 
-    public BackupItem() {}
+    public BackupItem() {
+    }
 
     public BackupItem(String src, String dest) {
         this.src = src;

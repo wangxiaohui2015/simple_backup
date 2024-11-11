@@ -2,6 +2,7 @@ package com.my.simplebackup.restore;
 
 import java.io.Console;
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 
 import com.my.simplebackup.common.Constants;
 import com.my.simplebackup.common.FileUtil;
@@ -26,10 +27,14 @@ public class RestoreMain {
     }
 
     public static void main(String[] args) {
-        startToRestore();
+        try {
+            startToRestore();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
-    private static void startToRestore() {
+    private static void startToRestore() throws UnsupportedEncodingException {
         prtln("");
         prtln("*********** WELCOME TO DATA RESTORE *************");
         prtln("*********** Version: " + Constants.SW_VERSION + " *********");
@@ -63,6 +68,8 @@ public class RestoreMain {
         }
 
         String password = enterPassword("Enter password: ", 1, 256);
+        byte[] keyBytes = password.getBytes(Constants.UTF_8);
+        password = "";
 
         prtln("");
         prtln("Calculating data size...");
@@ -80,7 +87,7 @@ public class RestoreMain {
         prtln("Executing restore...");
         prtln("");
         long startTime = System.currentTimeMillis();
-        executeRestoreTask(sourceFile, destFile, password);
+        executeRestoreTask(sourceFile, destFile, keyBytes);
         long endTime = System.currentTimeMillis();
         String timeTakenStr = TimeUtil.calculateElapsedTime(startTime, endTime);
         prtln("");
@@ -123,7 +130,7 @@ public class RestoreMain {
         System.out.println(str);
     }
 
-    private static void executeRestoreTask(File sourceDir, File destBaseDir, String key) {
+    private static void executeRestoreTask(File sourceDir, File destBaseDir, byte[] keyBytes) {
         File[] files = sourceDir.listFiles();
         if (null == files) {
             prtln("files is null when executing restore task.");
@@ -131,15 +138,15 @@ public class RestoreMain {
         for (File file : files) {
             if (file.isFile()) {
                 try {
-                    RestoreService.restoreFile(file, destBaseDir, key);
+                    RestoreService.restoreFile(file, destBaseDir, keyBytes);
                     double percentage = progressUtil.getProgress(file.length());
                     String percentageStr = String.format("%.2f", percentage);
                     prt("Completed " + percentageStr + "%. \r");
                 } catch (Exception e) {
-                    //e.printStackTrace();
+                    // e.printStackTrace();
                 }
             } else {
-                executeRestoreTask(file, destBaseDir, key);
+                executeRestoreTask(file, destBaseDir, keyBytes);
             }
         }
     }

@@ -64,9 +64,6 @@ public class HashUtil {
     }
 
     private static byte[] getSHAHash(File file, String algorithm) throws Exception {
-        if (!file.exists()) {
-            throw new Exception("File doesn't exist, " + file.getAbsolutePath());
-        }
         try (FileInputStream in = new FileInputStream(file)) {
             MessageDigest md = MessageDigest.getInstance(algorithm);
             byte[] bytes = new byte[1024 * 1024];

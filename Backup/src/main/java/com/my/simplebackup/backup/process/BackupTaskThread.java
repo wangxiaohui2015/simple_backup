@@ -19,13 +19,12 @@ public class BackupTaskThread implements Callable<RecordItem> {
 
     private static Logger logger = Logger.getLogger(BackupTaskThread.class);
 
-    private String key;
+    private byte[] keyBytes;
     private RecordItem recordItem;
     private BackupTaskController taskController;
 
-    public BackupTaskThread(String key, RecordItem recordItem,
-                    BackupTaskController taskController) {
-        this.key = key;
+    public BackupTaskThread(byte[] keyBytes, RecordItem recordItem, BackupTaskController taskController) {
+        this.keyBytes = keyBytes;
         this.recordItem = recordItem;
         this.taskController = taskController;
     }
@@ -34,34 +33,32 @@ public class BackupTaskThread implements Callable<RecordItem> {
     public RecordItem call() throws Exception {
         try {
             // Prepare metadata
-            FileMetadata metadata = FileMetadataHelper.generateFileMetadata(
-                            this.recordItem.getSrcBasePath(), this.recordItem.getSrcFullPath());
+            FileMetadata metadata = FileMetadataHelper.generateFileMetadata(this.recordItem.getSrcBasePath(),
+                    this.recordItem.getSrcFullPath());
             String metaDataJSON = FileMetadataHelper.getFileMetadataJSON(metadata);
             byte[] metaDataBytes = metaDataJSON.getBytes(Constants.UTF_8);
 
             // Encrypt metadata
-            byte[] metaDataKeyBytes = KeyUtil.getMetadataKeyBytes(this.key);
-            byte[] metaDataIVBytes = KeyUtil.getMetadataIVBytes(this.key);
-            AES256Encryptor metaDataEncryptor =
-                            new AES256Encryptor(metaDataKeyBytes, metaDataIVBytes);
+            byte[] metaDataKeyBytes = KeyUtil.getMetadataKeyBytes(this.keyBytes);
+            byte[] metaDataIVBytes = KeyUtil.getMetadataIVBytes(this.keyBytes);
+            AES256Encryptor metaDataEncryptor = new AES256Encryptor(metaDataKeyBytes, metaDataIVBytes);
             metaDataEncryptor.encryptMetadata(metaDataBytes, this.recordItem.getDestFullPath());
 
             // Encrypt file
-            byte[] fileKeyBytes = KeyUtil.getFileKeyBytes(this.key, metadata.getKeySalt());
+            byte[] fileKeyBytes = KeyUtil.getFileKeyBytes(this.keyBytes, metadata.getKeySalt());
             byte[] fileIVBytes = KeyUtil.getFileIVBytes(metadata.getAesIV());
             AES256Encryptor fileEncryptor = new AES256Encryptor(fileKeyBytes, fileIVBytes);
-            fileEncryptor.encryptFile(this.recordItem.getSrcFullPath(),
-                            this.recordItem.getDestFullPath());
+            fileEncryptor.encryptFile(this.recordItem.getSrcFullPath(), this.recordItem.getDestFullPath());
 
             // Update record item
             this.recordItem.setBackupStartTime(metadata.getBackupTime());
             this.recordItem.setBackupFinishTime(new Date().getTime());
             this.recordItem.setBackupSucceed(true);
-            logger.info("Backup succeed, src path: " + this.recordItem.getSrcFullPath()
-                            + ", dest path: " + this.recordItem.getDestFullPath());
+            logger.info("Backup succeed, src path: " + this.recordItem.getSrcFullPath() + ", dest path: "
+                    + this.recordItem.getDestFullPath());
         } catch (Exception e) {
-            logger.info("Backup failed, src path: " + this.recordItem.getSrcFullPath()
-                            + ", dest path: " + this.recordItem.getDestFullPath(), e);
+            logger.info("Backup failed, src path: " + this.recordItem.getSrcFullPath() + ", dest path: "
+                    + this.recordItem.getDestFullPath(), e);
             this.recordItem.setBackupSucceed(false);
         } finally {
             taskController.finishTask();

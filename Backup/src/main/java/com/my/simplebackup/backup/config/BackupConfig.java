@@ -6,8 +6,9 @@ import java.util.List;
  * BackupConfig.
  */
 public class BackupConfig {
-    private int thread;
-    private String key;
+    private int thread = 0;
+    private String key = "";
+    private byte[] keyBytes;
     private List<BackupItem> backups;
 
     public int getThread() {
@@ -32,5 +33,13 @@ public class BackupConfig {
 
     public void setBackups(List<BackupItem> backups) {
         this.backups = backups;
+    }
+
+    public byte[] getKeyBytes() {
+        return keyBytes;
+    }
+
+    public void setKeyBytes(byte[] keyBytes) {
+        this.keyBytes = keyBytes;
     }
 }

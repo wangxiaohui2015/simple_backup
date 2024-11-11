@@ -12,4 +12,9 @@ public class Constants {
     public static final int METADATA_OBSCURE_LEN_MAX = 32;
     public static final int METADATA_IV_LEN = 32;
     public static final int METADATA_KEY_SALT_LEN = 32;
+
+    public static final int BACKUP_TARGET_DIR_LEN = 6;
+    public static final String BACKUP_TARGET_FILE_POST_FIX = ".data";
+
+    public static final String BACKUP_MAIN_ROOT_DIR_KEY = "rootDir";
 }

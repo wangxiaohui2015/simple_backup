@@ -19,7 +19,17 @@ import com.my.simplebackup.common.HashUtil;
 import com.my.simplebackup.common.NumUtil;
 
 /**
- * Use AES256 algorithm to encrypt file.
+ * Use AES256 algorithm to encrypt metadata and file. </br>
+ *
+ * Below is format of the final encrypted file, </br>
+ * <b>metadata len(4 bytes) + metadata HASH(32 bytes) + encrypted metadata +
+ * encrypted file </b>
+ * 
+ * </br>
+ * metadata len: use 4 bytes to store the length of "encrypted metadata".
+ * metadata HASH: use 32 bytes to store SHA256 of "encrypted metadata".
+ * encrypted metadata: encrypted metadata, which includes the basic information
+ * of "encrypted file". encrypted file: encrypted content of original file.
  * 
  */
 public class AES256Encryptor {
@@ -29,6 +39,7 @@ public class AES256Encryptor {
     private static final String ALGORITHM = "AES";
     private static final String ALGORITHM_PKCS5PADDING = "AES/CBC/PKCS5Padding";
     private static final int CACHE_SIZE = 1024 * 1024;
+
     private byte[] keyBytes;
     private byte[] ivBytes;
 
@@ -40,10 +51,7 @@ public class AES256Encryptor {
     /**
      * Encrypt metadata.
      * 
-     * Data format: EncryptedMetadataBytesLen(4 Bytes) + OriMetadataHash(32 Bytes) +
-     * EncryptedMetadataBytes
-     * 
-     * @param bytes metadata bytes
+     * @param bytes        metadata bytes
      * @param destFilePath destination file path
      * @throws Exception Exception
      */
@@ -70,12 +78,12 @@ public class AES256Encryptor {
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
             byte[] encryptedMetadataBytes = cipher.doFinal(bytes);
 
-            // Write metadata length, will use 4 bytes
+            // Write metadata length, use 4 bytes
             int metadataLen = encryptedMetadataBytes.length;
             byte[] metadataLenBytes = NumUtil.intToByte(metadataLen);
             out.write(metadataLenBytes);
 
-            // Write metadata HASH, will use 32 bytes
+            // Write metadata HASH, use 32 bytes
             out.write(metadataHash);
 
             // Write encrypted metadata
@@ -91,7 +99,7 @@ public class AES256Encryptor {
      * Encrypt file.
      * 
      * @param sourceFilePath source file path
-     * @param destFilePath destination file path
+     * @param destFilePath   destination file path
      * @throws Exception Exception
      */
     public void encryptFile(String sourceFilePath, String destFilePath) throws Exception {
@@ -114,7 +122,7 @@ public class AES256Encryptor {
             Cipher cipher = Cipher.getInstance(ALGORITHM_PKCS5PADDING);
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
 
-            // Seek to the end of destination file.
+            // Seek to the end of destination file
             rFile = new RandomAccessFile(destFile, "rw");
             rFile.seek(destFile.length());
 

@@ -10,40 +10,40 @@ public class KeyUtil {
     /**
      * Get metadata key bytes.
      * 
-     * @param rootKey root key
+     * @param keyBytes key bytes
      * @return Metadata key bytes.
      * @throws Exception Exception
      */
-    public static byte[] getMetadataKeyBytes(String rootKey) throws Exception {
-        byte[] metaDataKeyRootBytes = getMetaDataRootKeyBytes(rootKey);
+    public static byte[] getMetadataKeyBytes(byte[] keyBytes) throws Exception {
+        byte[] metaDataKeyRootBytes = getMetaDataRootKeyBytes(keyBytes);
         return Arrays.copyOfRange(metaDataKeyRootBytes, 0, 32);
     }
 
     /**
      * Get metadata IV bytes.
      * 
-     * @param rootKey root key
+     * @param keyBytes key bytes
      * @return Metadata IV bytes
      * @throws Exception Exception
      */
-    public static byte[] getMetadataIVBytes(String rootKey) throws Exception {
-        byte[] metaDataKeyRootBytes = getMetaDataRootKeyBytes(rootKey);
+    public static byte[] getMetadataIVBytes(byte[] keyBytes) throws Exception {
+        byte[] metaDataKeyRootBytes = getMetaDataRootKeyBytes(keyBytes);
         return Arrays.copyOfRange(metaDataKeyRootBytes, 32, 48);
     }
 
     /**
      * Get file key bytes.
      * 
-     * @param rootKey     root key
-     * @param rootKeySalt root key salt
+     * @param keyBytes key bytes
+     * @param keySalt  key salt
      * @return File key bytes
      * @throws Exception Exception
      */
-    public static byte[] getFileKeyBytes(String rootKey, String rootKeySalt) throws Exception {
-        byte[] rootKeyBytes = generateRootKeyBytes(rootKey);
+    public static byte[] getFileKeyBytes(byte[] keyBytes, String keySalt) throws Exception {
+        byte[] rootKeyBytes = generateRootKeyBytes(keyBytes);
         byte[] fileRootKeyBytes = Arrays.copyOfRange(rootKeyBytes, 32, 64);
         String fileRootKeyStr = HashUtil.convertBytesToHexStr(fileRootKeyBytes);
-        String fileKey = fileRootKeyStr + rootKeySalt;
+        String fileKey = fileRootKeyStr + keySalt;
         byte[] fileKeyBytes = HashUtil.getSHA512Hash(fileKey.getBytes(Constants.UTF_8));
         return Arrays.copyOfRange(fileKeyBytes, 0, 32);
     }
@@ -60,15 +60,15 @@ public class KeyUtil {
         return Arrays.copyOfRange(ivBytes, 0, 16);
     }
 
-    private static byte[] getMetaDataRootKeyBytes(String rootKey) throws Exception {
-        byte[] rootKeyBytes = generateRootKeyBytes(rootKey);
+    private static byte[] getMetaDataRootKeyBytes(byte[] keyBytes) throws Exception {
+        byte[] rootKeyBytes = generateRootKeyBytes(keyBytes);
         byte[] metaDataRootKeyBytes = Arrays.copyOfRange(rootKeyBytes, 0, 32);
         metaDataRootKeyBytes = HashUtil.getSHA512Hash(metaDataRootKeyBytes);
         return metaDataRootKeyBytes;
     }
 
-    private static byte[] generateRootKeyBytes(String rootKey) throws Exception {
-        byte[] keyHashBytes = HashUtil.getSHA512Hash(rootKey.getBytes(Constants.UTF_8));
+    private static byte[] generateRootKeyBytes(byte[] keyBytes) throws Exception {
+        byte[] keyHashBytes = HashUtil.getSHA512Hash(keyBytes);
         String keyHashStr = HashUtil.convertBytesToHexStr(keyHashBytes);
         keyHashBytes = HashUtil.getSHA512Hash(keyHashStr.getBytes(Constants.UTF_8));
         return keyHashBytes;
