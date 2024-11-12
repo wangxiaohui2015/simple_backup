@@ -8,6 +8,7 @@ import java.util.List;
 public class BackupConfig {
     private int thread = 0;
     private String key = "";
+    private boolean enableChecksum = false;
     private byte[] keyBytes;
     private List<BackupItem> backups;
 
@@ -27,12 +28,12 @@ public class BackupConfig {
         this.key = key;
     }
 
-    public List<BackupItem> getBackups() {
-        return backups;
+    public boolean isEnableChecksum() {
+        return enableChecksum;
     }
 
-    public void setBackups(List<BackupItem> backups) {
-        this.backups = backups;
+    public void setEnableChecksum(boolean enableChecksum) {
+        this.enableChecksum = enableChecksum;
     }
 
     public byte[] getKeyBytes() {
@@ -41,5 +42,13 @@ public class BackupConfig {
 
     public void setKeyBytes(byte[] keyBytes) {
         this.keyBytes = keyBytes;
+    }
+
+    public List<BackupItem> getBackups() {
+        return backups;
+    }
+
+    public void setBackups(List<BackupItem> backups) {
+        this.backups = backups;
     }
 }

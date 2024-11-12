@@ -45,16 +45,19 @@ public class FileMetadataHelper {
     }
 
     /**
+     * 
      * Generate file metadata.
      * 
-     * @param srcBasePath src base path
-     * @param srcFullPath src full path
-     * @param backupTime  backup time
-     * @return FileMetaData
-     * @throws Exception Exception
+     * @param srcBasePath    src base path
+     * @param srcFullPath    src full path
+     * @param destFullPath   dest full path
+     * @param backupTime     backup time
+     * @param enableChecksum Enable checksum
+     * @return
+     * @throws Exception
      */
     public static FileMetadata generateFileMetadata(String srcBasePath, String srcFullPath, String destFullPath,
-            long backupTime) throws Exception {
+            long backupTime, boolean enableChecksum) throws Exception {
         FileMetadata metaData = new FileMetadata();
         File srcFile = new File(srcFullPath);
         metaData.setFileName(srcFile.getName());
@@ -67,8 +70,9 @@ public class FileMetadataHelper {
         metaData.setAesVersion(Constants.AES_VERSION);
         metaData.setAesIV(HashUtil.generateRandomString(Constants.METADATA_IV_LEN));
         metaData.setKeySalt(HashUtil.generateRandomString(Constants.METADATA_KEY_SALT_LEN));
-        // Calculating checksum has performance impact, skip here
-        // metaData.setCheckSum(HashUtil.convertBytesToHexStr(HashUtil.getSHA256Hash(srcFile)));
+        if (enableChecksum) {
+            metaData.setCheckSum(HashUtil.convertBytesToHexStr(HashUtil.getSHA256Hash(srcFile)));
+        }
         metaData.setObscure(
                 HashUtil.generateRandomString(Constants.METADATA_OBSCURE_LEN_MIN, Constants.METADATA_OBSCURE_LEN_MAX));
         return metaData;

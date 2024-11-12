@@ -36,7 +36,8 @@ public class BackupTaskThread implements Callable<TaskResult> {
 
             // Prepare metadata
             FileMetadata metadata = FileMetadataHelper.generateFileMetadata(this.backupTaskConfig.getSrcBasePath(),
-                    this.backupTaskConfig.getSrcFullPath(), this.backupTaskConfig.getDestFullPath(), taskResult.getStartTime());
+                    this.backupTaskConfig.getSrcFullPath(), this.backupTaskConfig.getDestFullPath(),
+                    taskResult.getStartTime(), this.backupTaskConfig.isEnableChecksum());
             String metaDataJSON = FileMetadataHelper.getFileMetadataJSON(metadata);
             byte[] metaDataBytes = metaDataJSON.getBytes(Constants.UTF_8);
 

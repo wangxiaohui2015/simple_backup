@@ -8,15 +8,18 @@ public class BackupTaskConfig {
     private String srcFullPath;
     private String destBasePath;
     private String destFullPath;
+    private boolean enableChecksum;
 
     public BackupTaskConfig() {
     }
 
-    public BackupTaskConfig(String srcBasePath, String srcFullPath, String destBaseDir, String destFullPath) {
+    public BackupTaskConfig(String srcBasePath, String srcFullPath, String destBaseDir, String destFullPath,
+            boolean enableChecksum) {
         this.srcBasePath = srcBasePath;
         this.srcFullPath = srcFullPath;
         this.destBasePath = destBaseDir;
         this.destFullPath = destFullPath;
+        this.enableChecksum = enableChecksum;
     }
 
     public String getSrcBasePath() {
@@ -49,5 +52,13 @@ public class BackupTaskConfig {
 
     public void setDestFullPath(String destFullPath) {
         this.destFullPath = destFullPath;
+    }
+
+    public boolean isEnableChecksum() {
+        return enableChecksum;
+    }
+
+    public void setEnableChecksum(boolean enableChecksum) {
+        this.enableChecksum = enableChecksum;
     }
 }

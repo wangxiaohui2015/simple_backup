@@ -122,7 +122,8 @@ public class BackupMain {
                 if (new File(destFullPath).exists()) {
                     continue;
                 }
-                BackupTaskConfig config = new BackupTaskConfig(srcBaseDir, srcFullPath, destBaseDir, destFullPath);
+                BackupTaskConfig config = new BackupTaskConfig(srcBaseDir, srcFullPath, destBaseDir, destFullPath,
+                        this.configManager.getBackupConfig().isEnableChecksum());
                 BackupTaskThread task = new BackupTaskThread(this.configManager.getBackupConfig().getKeyBytes(),
                         config);
                 Future<TaskResult> future = this.taskExecutor.submit(task);

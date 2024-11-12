@@ -50,6 +50,7 @@
                             <target name="copy release related files">
                                 <copy todir="${basedir}/target/release">
                                     <fileset dir="${basedir}/build" />
+                                    <fileset dir="${basedir}/src/main/resources" />
                                 </copy>
                                 <chmod file="${basedir}/target/release/*.sh"
                                     perm="755" />
