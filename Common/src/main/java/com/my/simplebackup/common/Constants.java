@@ -16,5 +16,5 @@ public class Constants {
     public static final int BACKUP_TARGET_DIR_LEN = 6;
     public static final String BACKUP_TARGET_FILE_POST_FIX = ".data";
 
-    public static final String BACKUP_MAIN_ROOT_DIR_KEY = "rootDir";
+    public static final String MAIN_ROOT_DIR_KEY = "rootDir";
 }

@@ -3,21 +3,23 @@ package com.my.simplebackup.backup;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
 
 import com.my.simplebackup.backup.config.BackupConfigManager;
 import com.my.simplebackup.backup.config.BackupItem;
-import com.my.simplebackup.backup.process.BackupExecutor;
-import com.my.simplebackup.backup.process.BackupTaskController;
-import com.my.simplebackup.backup.process.BackupTaskThread;
-import com.my.simplebackup.backup.record.RecordItem;
-import com.my.simplebackup.backup.statistics.BackupStatisticsHelper;
+import com.my.simplebackup.backup.task.BackupTaskConfig;
+import com.my.simplebackup.backup.task.BackupTaskThread;
 import com.my.simplebackup.common.Constants;
 import com.my.simplebackup.common.FileUtil;
 import com.my.simplebackup.common.HashUtil;
 import com.my.simplebackup.common.StringUtil;
 import com.my.simplebackup.common.statistics.StatisticsEntity;
+import com.my.simplebackup.common.statistics.StatisticsHelper;
+import com.my.simplebackup.common.task.TaskResult;
 
 /**
  * The main entry of backup.
@@ -26,11 +28,8 @@ public class BackupMain {
 
     private static Logger logger;
 
-    private BackupTaskController taskController;
     private BackupConfigManager configManager;
-    private BackupExecutor executor;
-    private StatisticsEntity statEntity;
-    private List<RecordItem> recordItems;
+    private ExecutorService taskExecutor;
 
     public static void main(String[] args) {
         new BackupMain(args).startBackup();
@@ -43,57 +42,71 @@ public class BackupMain {
     private void startBackup() {
         try {
             logger.info("Begin to execute backup task.");
+            StatisticsEntity statEntity = new StatisticsEntity();
             statEntity.startStat();
-            executeBackupTask();
-            this.taskController.await();
+            List<TaskResult> taskResult = executeBackupTask();
+            statEntity.endStat();
+            StatisticsHelper.statAndShowBackupResult(statEntity, taskResult);
         } catch (Throwable e) {
             logger.error("Exception occurred while executing backup task.", e);
         } finally {
-            this.executor.shutDownExecutorService();
-            statEntity.endStat();
-            BackupStatisticsHelper.statsBackupResults(this.statEntity, this.recordItems);
-            BackupStatisticsHelper.showStatInformation(this.statEntity);
+            this.taskExecutor.shutdown();
             logger.info("End to execute backup task.");
         }
     }
 
-    private void executeBackupTask() throws Exception {
+    private List<TaskResult> executeBackupTask() throws Exception {
+        List<TaskResult> taskResults = new ArrayList<TaskResult>();
+        List<Future<TaskResult>> taskFutures = new ArrayList<Future<TaskResult>>();
+
         List<BackupItem> backupItems = this.configManager.getBackupConfig().getBackups();
         for (BackupItem item : backupItems) {
             String srcDir = item.getSrc();
             String destDir = item.getDest();
-            if (StringUtil.isEmpty(srcDir)) {
-                logger.warn("sourceDir is null or empty, sourceDir: " + srcDir + ", destDir: " + destDir);
+            if (verifyBackupTask(srcDir, destDir)) {
                 continue;
             }
-            if (StringUtil.isEmpty(destDir)) {
-                logger.warn("destDir is null or empty, sourceDir: " + srcDir + ", destDir: " + destDir);
-                continue;
-            }
-
-            File srcFile = new File(srcDir);
-            File destFile = new File(destDir);
-            if (!srcFile.isDirectory() || !srcFile.exists()) {
-                logger.warn("Source dir isn't a directory or doesn't exist, sourceDir: " + srcDir);
-                continue;
-            }
-            if (!destFile.isDirectory() || !destFile.exists()) {
-                logger.warn("Dest dir isn't a directory or doesn't exist, destDir: " + destDir);
-                continue;
-            }
-            if (FileUtil.isSubFile(srcFile, destFile)) {
-                logger.warn(
-                        "Source dir is the sub dir of dest dir, or dest dir is the sub dir of source dir, skip this entry, source dir: "
-                                + srcDir + ", dest dir: " + destDir);
-                continue;
-            }
-
             logger.info("Processing backup task, sourceDir: " + srcDir + ", destDir: " + destDir);
-            processBackupTask(srcDir, srcDir, destDir);
+            processBackupTask(srcDir, srcDir, destDir, taskFutures);
         }
+
+        // Wait all task to be finished and get results
+        for (Future<TaskResult> future : taskFutures) {
+            taskResults.add(future.get());
+        }
+        return taskResults;
     }
 
-    private void processBackupTask(String srcBaseDir, String srcFullDir, String destBaseDir) throws Exception {
+    private boolean verifyBackupTask(String srcDir, String destDir) {
+        if (StringUtil.isEmpty(srcDir)) {
+            logger.warn("sourceDir is null or empty, sourceDir: " + srcDir + ", destDir: " + destDir);
+            return false;
+        }
+        if (StringUtil.isEmpty(destDir)) {
+            logger.warn("destDir is null or empty, sourceDir: " + srcDir + ", destDir: " + destDir);
+            return false;
+        }
+        File srcFile = new File(srcDir);
+        File destFile = new File(destDir);
+        if (!srcFile.isDirectory() || !srcFile.exists()) {
+            logger.warn("Source dir isn't a directory or doesn't exist, sourceDir: " + srcDir);
+            return false;
+        }
+        if (!destFile.isDirectory() || !destFile.exists()) {
+            logger.warn("Dest dir isn't a directory or doesn't exist, destDir: " + destDir);
+            return false;
+        }
+        if (FileUtil.isSubFile(srcFile, destFile)) {
+            logger.warn(
+                    "Source dir is the sub dir of dest dir, or dest dir is the sub dir of source dir, skip this entry, source dir: "
+                            + srcDir + ", dest dir: " + destDir);
+            return false;
+        }
+        return true;
+    }
+
+    private void processBackupTask(String srcBaseDir, String srcFullDir, String destBaseDir,
+            List<Future<TaskResult>> taskFutures) throws Exception {
         File sourceFile = new File(srcFullDir);
         File[] files = sourceFile.listFiles();
         if (null == files) {
@@ -109,14 +122,13 @@ public class BackupMain {
                 if (new File(destFullPath).exists()) {
                     continue;
                 }
-                RecordItem recordItem = new RecordItem(srcBaseDir, srcFullPath, destBaseDir, destFullPath,
-                        file.length());
+                BackupTaskConfig config = new BackupTaskConfig(srcBaseDir, srcFullPath, destBaseDir, destFullPath);
                 BackupTaskThread task = new BackupTaskThread(this.configManager.getBackupConfig().getKeyBytes(),
-                        recordItem, this.taskController);
-                recordItems.add(recordItem);
-                this.executor.submitTask(task, this.taskController);
+                        config);
+                Future<TaskResult> future = this.taskExecutor.submit(task);
+                taskFutures.add(future);
             } else {
-                processBackupTask(srcBaseDir, file.getAbsolutePath(), destBaseDir);
+                processBackupTask(srcBaseDir, file.getAbsolutePath(), destBaseDir, taskFutures);
             }
         }
     }
@@ -132,7 +144,7 @@ public class BackupMain {
     }
 
     private void init(String[] args) {
-        String rootDir = System.getProperty(Constants.BACKUP_MAIN_ROOT_DIR_KEY);
+        String rootDir = System.getProperty(Constants.MAIN_ROOT_DIR_KEY);
         if (StringUtil.isEmpty(rootDir) || !new File(rootDir).isDirectory()) {
             System.out.println("ERROR: rootDir is not set or not exist, system exits.");
             System.exit(-1);
@@ -144,11 +156,8 @@ public class BackupMain {
             System.exit(-1);
         }
         try {
-            this.taskController = new BackupTaskController();
             this.configManager = new BackupConfigManager(rootDir);
-            this.executor = new BackupExecutor(this.configManager.getBackupConfig().getThread());
-            this.statEntity = new StatisticsEntity();
-            this.recordItems = new ArrayList<RecordItem>();
+            this.taskExecutor = Executors.newFixedThreadPool(this.configManager.getBackupConfig().getThread());
         } catch (Exception e) {
             logger.error("Failed to initialize system.", e);
             System.exit(-1);

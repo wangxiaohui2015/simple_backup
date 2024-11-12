@@ -1,14 +1,18 @@
-package com.my.simplebackup.restore;
+package com.my.simplebackup.restore.task;
+
+import com.my.simplebackup.common.metadata.FileMetadata;
 
 /**
- * MetaDataDecryptRet.
+ * MetadataDecryptResult.
  */
-public class MetadataDecryptRet {
+public class MetadataDecryptResult {
     private int metadataEncryptLen;
     private byte[] metadataBytes;
     private byte[] metadataHash;
+    private String filePath;
+    private FileMetadata metadata;
 
-    public MetadataDecryptRet(int metadataEncryptLen, byte[] metadataBytes, byte[] metadataHash) {
+    public MetadataDecryptResult(int metadataEncryptLen, byte[] metadataBytes, byte[] metadataHash) throws Exception {
         this.metadataEncryptLen = metadataEncryptLen;
         this.metadataBytes = metadataBytes;
         this.metadataHash = metadataHash;
@@ -36,5 +40,21 @@ public class MetadataDecryptRet {
 
     public void setMetadataHash(byte[] metadataHash) {
         this.metadataHash = metadataHash;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public FileMetadata getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(FileMetadata metadata) {
+        this.metadata = metadata;
     }
 }

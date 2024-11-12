@@ -77,6 +77,28 @@ public class FileUtil {
     }
 
     /**
+     * Check if the given file path exist and is a file.
+     * 
+     * @param filePath file path
+     * @return true: exist and it's a file
+     */
+    public static boolean isFile(String filePath) {
+        File file = new File(filePath);
+        return file.exists() && file.isFile();
+    }
+
+    /**
+     * Check if the given file path exist and is a directory.
+     * 
+     * @param filePath file path
+     * @return true: exist and it's a directory
+     */
+    public static boolean isDir(String filePath) {
+        File file = new File(filePath);
+        return file.exists() && file.isDirectory();
+    }
+
+    /**
      * Get file size, byte
      * 
      * @param file file or directory

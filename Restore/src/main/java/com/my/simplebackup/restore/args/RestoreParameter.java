@@ -1,0 +1,63 @@
+package com.my.simplebackup.restore.args;
+
+public class RestoreParameter {
+
+    private int threads = 3; // Default is 3
+    private byte[] keyBytes;
+    private String srcPath = "";
+    private String destPath = "";
+    private MODE_TYPE mode = MODE_TYPE.RESTORE; // Default is RESTORE
+    private String filter = ""; // Default is empty string, match all path
+
+    public static enum MODE_TYPE {
+        METADATA, FAKE, RESTORE
+    }
+
+    public int getThreads() {
+        return threads;
+    }
+
+    public void setThreads(int threads) {
+        this.threads = threads;
+    }
+
+    public byte[] getKeyBytes() {
+        return keyBytes;
+    }
+
+    public void setKeyBytes(byte[] keyBytes) {
+        this.keyBytes = keyBytes;
+    }
+
+    public String getSrcPath() {
+        return srcPath;
+    }
+
+    public void setSrcPath(String srcPath) {
+        this.srcPath = srcPath;
+    }
+
+    public String getDestPath() {
+        return destPath;
+    }
+
+    public void setDestPath(String destPath) {
+        this.destPath = destPath;
+    }
+
+    public MODE_TYPE getMode() {
+        return mode;
+    }
+
+    public void setMode(MODE_TYPE mode) {
+        this.mode = mode;
+    }
+
+    public String getFilter() {
+        return filter;
+    }
+
+    public void setFilter(String filter) {
+        this.filter = filter;
+    }
+}

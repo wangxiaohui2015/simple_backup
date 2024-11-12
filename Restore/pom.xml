@@ -15,6 +15,11 @@
             <artifactId>Common</artifactId>
             <version>3.0.0-RELEASE</version>
         </dependency>
+        <dependency>
+            <groupId>commons-cli</groupId>
+            <artifactId>commons-cli</artifactId>
+            <version>1.9.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -30,6 +35,29 @@
             </resource>
         </resources>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target name="copy release related files">
+                                <copy todir="${basedir}/target/release">
+                                    <fileset dir="${basedir}/build" />
+                                </copy>
+                                <chmod file="${basedir}/target/release/*.sh"
+                                    perm="755" />
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>

@@ -12,7 +12,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 import com.my.simplebackup.common.FileUtil;
 import com.my.simplebackup.common.NumUtil;
-import com.my.simplebackup.restore.MetadataDecryptRet;
+import com.my.simplebackup.common.metadata.FileMetadataHelper;
+import com.my.simplebackup.restore.task.MetadataDecryptResult;
 
 /**
  * Use AES256 algorithm to decrypt file.
@@ -35,13 +36,13 @@ public class AES256Decryptor {
     }
 
     /**
-     * Decrypt meta data.
+     * Restore metadata.
      * 
      * @param filePath file path
      * @return MetadataDecryptRet object
      * @throws Exception Exception
      */
-    public MetadataDecryptRet decryptMetadata(String filePath) throws Exception {
+    public MetadataDecryptResult decryptMetadata(String filePath) throws Exception {
         File file = new File(filePath);
         if (!file.exists()) {
             throw new Exception("File doesn't exist: " + filePath);
@@ -70,7 +71,9 @@ public class AES256Decryptor {
             // Calculate metadata encrypt length
             int metadataEncryptLen = META_DATA_BYTES_LEN + META_DATA_HASH_BYTES_LEN + metadataLen;
 
-            MetadataDecryptRet ret = new MetadataDecryptRet(metadataEncryptLen, metadataBytes, metadataHashBytes);
+            MetadataDecryptResult ret = new MetadataDecryptResult(metadataEncryptLen, metadataBytes, metadataHashBytes);
+            ret.setMetadata(FileMetadataHelper.getFileMetadataObj(metadataBytes));
+            ret.setFilePath(filePath);
             return ret;
         } catch (Exception e) {
             throw e;

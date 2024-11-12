@@ -8,25 +8,11 @@
         <version>3.0.0-RELEASE</version>
     </parent>
     <artifactId>Backup</artifactId>
-    <properties>
-        <log4j.version>1.2.17</log4j.version>
-        <sl4j.version>1.7.36</sl4j.version>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>com.my.backup</groupId>
             <artifactId>Common</artifactId>
             <version>3.0.0-RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>${log4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>${sl4j.version}</version>
         </dependency>
     </dependencies>
     <build>
@@ -56,8 +42,6 @@
                         <configuration>
                             <target name="copy release related files">
                                 <copy todir="${basedir}/target/release">
-                                    <fileset dir="${basedir}"
-                                        includes="README.md" />
                                     <fileset dir="${basedir}/build" />
                                     <fileset dir="${basedir}/src/main/resources" />
                                 </copy>
