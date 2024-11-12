@@ -11,10 +11,10 @@ import java.io.RandomAccessFile;
  */
 public class FileUtil {
 
-    private static final long TB = 1024L * 1024 * 1024 * 1024;
-    private static final long GB = 1024L * 1024 * 1024;
-    private static final long MB = 1024L * 1024;
-    private static final long KB = 1024L;
+    private static final long KB = 1024;
+    private static final long MB = KB * 1024;
+    private static final long GB = MB * 1024;
+    private static final long TB = GB * 1024;
 
     /**
      * Close input stream.
@@ -102,38 +102,36 @@ public class FileUtil {
     /**
      * Get file size string by file bytes
      * 
+     * @param fileSize      file size, bytes
+     * @param isAppendBytes is append bytes
+     * @return String format file size
+     */
+    public static String getFileSizeString(long fileSize, boolean isAppendBytes) {
+        StringBuilder sb = new StringBuilder();
+        if (fileSize >= TB) {
+            sb.append(String.format("%.2f TB", (double) fileSize / TB));
+        } else if (fileSize >= GB) {
+            sb.append(String.format("%.2f GB", (double) fileSize / GB));
+        } else if (fileSize >= MB) {
+            sb.append(String.format("%.2f MB", (double) fileSize / MB));
+        } else if (fileSize >= KB) {
+            sb.append(String.format("%.2f KB", (double) fileSize / KB));
+        } else {
+            sb.append(fileSize + " B");
+        }
+        if (isAppendBytes) {
+            sb.append(" (" + fileSize + " bytes)");
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Get file size string by file bytes
+     * 
      * @param fileSize file size, bytes
      * @return String format file size
      */
     public static String getFileSizeString(long fileSize) {
-        long tb = fileSize / TB;
-        long gb = (fileSize - tb * TB) / GB;
-        long mb = (fileSize - tb * TB - gb * GB) / MB;
-        long kb = (fileSize - tb * TB - gb * GB - mb * MB) / KB;
-        long b = (fileSize - tb * TB - gb * GB - mb * MB - kb * KB);
-
-        StringBuffer sb = new StringBuffer();
-        if (tb != 0) {
-            sb.append(tb + "TB, ");
-        }
-        if (gb != 0) {
-            sb.append(gb + "GB, ");
-        }
-        if (mb != 0) {
-            sb.append(mb + "MB, ");
-        }
-        if (kb != 0) {
-            sb.append(kb + "KB, ");
-        }
-        if (b != 0) {
-            sb.append(b + "B, ");
-        }
-        String str = sb.toString();
-        if (str.length() > 2) {
-            str = str.substring(0, str.length() - 2);
-        } else {
-            str = "0B";
-        }
-        return str;
+        return getFileSizeString(fileSize, false);
     }
 }

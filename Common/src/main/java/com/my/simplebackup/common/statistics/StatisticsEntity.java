@@ -15,9 +15,9 @@ public class StatisticsEntity {
     private long succeedTargetFileSize;
     private long startTime;
     private long endTime;
-    private double rate;
+    private long rate;
 
-    public double calculateRate() {
+    public long calculateRate() {
         long timeTaken = (endTime - startTime) / 1000; // Second
         if (timeTaken > 0) {
             rate = succeedFileSize / timeTaken;
@@ -97,11 +97,11 @@ public class StatisticsEntity {
         this.endTime = endTime;
     }
 
-    public double getRate() {
+    public long getRate() {
         return rate;
     }
 
-    public void setRate(double rate) {
+    public void setRate(long rate) {
         this.rate = rate;
     }
 

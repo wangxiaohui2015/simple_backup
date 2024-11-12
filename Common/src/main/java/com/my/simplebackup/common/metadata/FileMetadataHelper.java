@@ -51,14 +51,15 @@ public class FileMetadataHelper {
      * @return FileMetaData
      * @throws Exception Exception
      */
-    public static FileMetadata generateFileMetadata(String srcBasePath, String srcFullPath)
-                    throws Exception {
+    public static FileMetadata generateFileMetadata(String srcBasePath, String srcFullPath, String destFullPath)
+            throws Exception {
         FileMetadata metaData = new FileMetadata();
         File srcFile = new File(srcFullPath);
         metaData.setFileName(srcFile.getName());
         metaData.setFileBasePath(srcBasePath);
         metaData.setFileFullPath(srcFullPath);
         metaData.setFileLen(srcFile.length());
+        metaData.setDestFileFullPath(destFullPath);
         metaData.setBackupTime(new Date().getTime());
         metaData.setBackupSWVersion(Constants.SW_VERSION);
         metaData.setAesVersion(Constants.AES_VERSION);
@@ -66,8 +67,8 @@ public class FileMetadataHelper {
         metaData.setKeySalt(HashUtil.generateRandomString(Constants.METADATA_KEY_SALT_LEN));
         // Calculating checksum has performance impact, skip here
         // metaData.setCheckSum(HashUtil.convertBytesToHexStr(HashUtil.getSHA256Hash(srcFile)));
-        metaData.setObscure(HashUtil.generateRandomString(Constants.METADATA_OBSCURE_LEN_MIN,
-                        Constants.METADATA_OBSCURE_LEN_MAX));
+        metaData.setObscure(
+                HashUtil.generateRandomString(Constants.METADATA_OBSCURE_LEN_MIN, Constants.METADATA_OBSCURE_LEN_MAX));
         return metaData;
     }
 }

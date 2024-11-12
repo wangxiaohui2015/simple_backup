@@ -8,6 +8,7 @@ public class FileMetadata {
     private String fileName = "";
     private String fileBasePath = "";
     private String fileFullPath = "";
+    private String destFileFullPath = "";
     private long fileLen = 0;
     private long backupTime = 0;
     private String backupSWVersion = "";
@@ -39,6 +40,14 @@ public class FileMetadata {
 
     public void setFileFullPath(String fileFullPath) {
         this.fileFullPath = fileFullPath;
+    }
+
+    public String getDestFileFullPath() {
+        return destFileFullPath;
+    }
+
+    public void setDestFileFullPath(String destFileFullPath) {
+        this.destFileFullPath = destFileFullPath;
     }
 
     public long getFileLen() {
