@@ -63,7 +63,7 @@ public class BackupMain {
         for (BackupItem item : backupItems) {
             String srcDir = item.getSrc();
             String destDir = item.getDest();
-            if (verifyBackupTask(srcDir, destDir)) {
+            if (!verifyBackupTask(srcDir, destDir)) {
                 continue;
             }
             logger.info("Processing backup task, sourceDir: " + srcDir + ", destDir: " + destDir);
