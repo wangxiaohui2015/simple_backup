@@ -10,7 +10,8 @@ import java.util.Locale;
  */
 public class TimeUtil {
 
-    private static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+    private static SimpleDateFormat format =
+                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 
     private static final long HOUR = 60 * 60 * 1000L;
     private static final long MINUTE = 60 * 1000L;

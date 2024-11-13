@@ -79,7 +79,8 @@ public class BackupMain {
 
     private boolean verifyBackupTask(String srcDir, String destDir) {
         if (StringUtil.isEmpty(srcDir)) {
-            logger.warn("sourceDir is null or empty, sourceDir: " + srcDir + ", destDir: " + destDir);
+            logger.warn("sourceDir is null or empty, sourceDir: " + srcDir + ", destDir: "
+                            + destDir);
             return false;
         }
         if (StringUtil.isEmpty(destDir)) {
@@ -115,16 +116,17 @@ public class BackupMain {
         for (File file : files) {
             if (file.isFile()) {
                 String srcFullPath = file.getAbsolutePath();
-                String srcFullPathHash = HashUtil
-                                .convertBytesToHexStr(HashUtil.getSHA256Hash(srcFullPath.getBytes(Constants.UTF_8)));
+                String srcFullPathHash = HashUtil.convertBytesToHexStr(
+                                HashUtil.getSHA256Hash(srcFullPath.getBytes(Constants.UTF_8)));
                 String destFullPath = genDestFullPath(destBaseDir, srcFullPathHash);
                 if (new File(destFullPath).exists()) {
                     continue;
                 }
-                BackupTaskConfig config = new BackupTaskConfig(srcBaseDir, srcFullPath, destBaseDir, destFullPath,
+                BackupTaskConfig config = new BackupTaskConfig(srcBaseDir, srcFullPath, destBaseDir,
+                                destFullPath,
                                 this.configManager.getBackupConfig().isEnableChecksum());
-                BackupTaskThread task =
-                                new BackupTaskThread(this.configManager.getBackupConfig().getKeyBytes(), config);
+                BackupTaskThread task = new BackupTaskThread(
+                                this.configManager.getBackupConfig().getKeyBytes(), config);
                 Future<TaskResult> future = this.taskExecutor.submit(task);
                 taskFutures.add(future);
             } else {
@@ -139,7 +141,8 @@ public class BackupMain {
         for (int i = 0; i < Constants.BACKUP_TARGET_DIR_LEN; i++) {
             sb.append(File.separator).append(srcFullPathHash.substring(i, i + 1));
         }
-        sb.append(File.separator).append(srcFullPathHash).append(Constants.BACKUP_TARGET_FILE_POST_FIX);
+        sb.append(File.separator).append(srcFullPathHash)
+                        .append(Constants.BACKUP_TARGET_FILE_POST_FIX);
         return sb.toString();
     }
 
@@ -157,7 +160,8 @@ public class BackupMain {
         }
         try {
             this.configManager = new BackupConfigManager(rootDir);
-            this.taskExecutor = Executors.newFixedThreadPool(this.configManager.getBackupConfig().getThread());
+            this.taskExecutor = Executors
+                            .newFixedThreadPool(this.configManager.getBackupConfig().getThread());
         } catch (Exception e) {
             logger.error("Failed to initialize system.", e);
             System.exit(-1);

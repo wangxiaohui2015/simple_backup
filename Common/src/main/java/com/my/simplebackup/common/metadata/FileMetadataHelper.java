@@ -56,8 +56,8 @@ public class FileMetadataHelper {
      * @return FileMetadata
      * @throws Exception Exception
      */
-    public static FileMetadata generateFileMetadata(String srcBasePath, String srcFullPath, String destFullPath,
-                    long backupTime, boolean enableChecksum) throws Exception {
+    public static FileMetadata generateFileMetadata(String srcBasePath, String srcFullPath,
+                    String destFullPath, long backupTime, boolean enableChecksum) throws Exception {
         FileMetadata metadata = new FileMetadata();
         File srcFile = new File(srcFullPath);
         metadata.setFileName(srcFile.getName());
@@ -85,7 +85,8 @@ public class FileMetadataHelper {
      * @param destFile destination file
      * @throws Exception Exception
      */
-    public static void saveMetadataListToFile(List<FileMetadata> list, String destFile) throws Exception {
+    public static void saveMetadataListToFile(List<FileMetadata> list, String destFile)
+                    throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
         mapper.writeValue(new File(destFile), list);

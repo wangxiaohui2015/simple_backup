@@ -32,7 +32,8 @@ public class MetadataTaskThread implements Callable<MetadataDecryptResult> {
             logger.info("Restore metadata succeed, file path: " + this.fileFullPath);
             return ret;
         } catch (Exception e) {
-            logger.info("Restore metadata failed, file path: " + this.fileFullPath + ", error msg: " + e.getMessage());
+            logger.info("Restore metadata failed, file path: " + this.fileFullPath + ", error msg: "
+                            + e.getMessage());
         }
         return null;
     }

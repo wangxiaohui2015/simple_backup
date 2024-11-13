@@ -12,7 +12,8 @@ public class MetadataDecryptResult {
     private String filePath;
     private FileMetadata metadata;
 
-    public MetadataDecryptResult(int metadataEncryptLen, byte[] metadataBytes, byte[] metadataHash) throws Exception {
+    public MetadataDecryptResult(int metadataEncryptLen, byte[] metadataBytes, byte[] metadataHash)
+                    throws Exception {
         this.metadataEncryptLen = metadataEncryptLen;
         this.metadataBytes = metadataBytes;
         this.metadataHash = metadataHash;

@@ -87,12 +87,14 @@ public class RestoreMain {
         for (MetadataDecryptResult ret : retList) {
             metadataList.add(ret.getMetadata());
         }
-        String destPath = parameter.getDestPath() + File.separator + "metadata_" + new Date().getTime() + ".json";
+        String destPath = parameter.getDestPath() + File.separator + "metadata_"
+                        + new Date().getTime() + ".json";
         FileMetadataHelper.saveMetadataListToFile(metadataList, destPath);
         StatisticsHelper.showStdAndLog("Succeed to save metadata, file path: " + destPath);
     }
 
-    private List<TaskResult> restoreFile(RestoreParameter parameter, boolean isFake) throws Exception {
+    private List<TaskResult> restoreFile(RestoreParameter parameter, boolean isFake)
+                    throws Exception {
         List<TaskResult> taskResults = new ArrayList<TaskResult>();
 
         // Create progress utility to monitor progress
@@ -104,8 +106,8 @@ public class RestoreMain {
 
         // Submit task and wait all task to be finished
         List<Future<TaskResult>> futureList = new ArrayList<Future<TaskResult>>();
-        getRestoreFutureList(parameter.getSrcPath(), parameter.getDestPath(), parameter.getKeyBytes(), isFake,
-                        futureList);
+        getRestoreFutureList(parameter.getSrcPath(), parameter.getDestPath(),
+                        parameter.getKeyBytes(), isFake, futureList);
         for (Future<TaskResult> future : futureList) {
             TaskResult result = future.get();
             double percentage = progressUtil.getProgress(result.getSrcFileSize());
@@ -117,8 +119,8 @@ public class RestoreMain {
         return taskResults;
     }
 
-    private void getRestoreFutureList(String srcPath, String destDir, byte[] keyBytes, boolean isFake,
-                    List<Future<TaskResult>> futureList) throws Exception {
+    private void getRestoreFutureList(String srcPath, String destDir, byte[] keyBytes,
+                    boolean isFake, List<Future<TaskResult>> futureList) throws Exception {
         File sourceFile = new File(srcPath);
         File[] files = sourceFile.listFiles();
         if (null == files) {
@@ -127,7 +129,8 @@ public class RestoreMain {
         }
         for (File file : files) {
             if (file.isFile()) {
-                RestoreTaskThread task = new RestoreTaskThread(keyBytes, file.getAbsolutePath(), destDir, isFake);
+                RestoreTaskThread task = new RestoreTaskThread(keyBytes, file.getAbsolutePath(),
+                                destDir, isFake);
                 Future<TaskResult> future = this.taskExecutor.submit(task);
                 futureList.add(future);
             } else {
@@ -155,10 +158,13 @@ public class RestoreMain {
         }
     }
 
-    private List<MetadataDecryptResult> getMetadataRetList(RestoreParameter parameter) throws Exception {
+    private List<MetadataDecryptResult> getMetadataRetList(RestoreParameter parameter)
+                    throws Exception {
         List<MetadataDecryptResult> retList = new ArrayList<MetadataDecryptResult>();
-        List<Future<MetadataDecryptResult>> futureList = new ArrayList<Future<MetadataDecryptResult>>();
-        getMetadataDecryptRetFutureList(parameter.getSrcPath(), parameter.getKeyBytes(), futureList);
+        List<Future<MetadataDecryptResult>> futureList =
+                        new ArrayList<Future<MetadataDecryptResult>>();
+        getMetadataDecryptRetFutureList(parameter.getSrcPath(), parameter.getKeyBytes(),
+                        futureList);
 
         // Wait task to complete
         for (Future<MetadataDecryptResult> future : futureList) {

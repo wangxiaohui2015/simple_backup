@@ -21,7 +21,8 @@ public class BackupConfigManager {
     public static final String DEFAULT_CONFIG_FILE_NAME = "backup.json";
 
     public BackupConfigManager(String configRootPath) throws Exception {
-        this.configFilePath = configRootPath + File.separator + "conf" + File.separator + DEFAULT_CONFIG_FILE_NAME;
+        this.configFilePath = configRootPath + File.separator + "conf" + File.separator
+                        + DEFAULT_CONFIG_FILE_NAME;
         ObjectMapper mapper = new ObjectMapper();
         this.config = mapper.readValue(new File(this.configFilePath), BackupConfig.class);
         checkConfig();
@@ -36,8 +37,8 @@ public class BackupConfigManager {
         // check thread number
         int thread = this.config.getThread();
         if (thread < CONFIG_THREAD_MIN || thread > CONFIG_THREAD_MAX) {
-            throw new IllegalArgumentException(
-                            "Thread number must be in [" + CONFIG_THREAD_MIN + "," + CONFIG_THREAD_MAX + "], " + msg);
+            throw new IllegalArgumentException("Thread number must be in [" + CONFIG_THREAD_MIN
+                            + "," + CONFIG_THREAD_MAX + "], " + msg);
         }
 
         // check key

@@ -58,15 +58,17 @@ public class RestoreTaskThread implements Callable<TaskResult> {
             }
 
             // Decrypt file
-            String destFullPath = decryptFile(metadataRet.getFilePath(), this.destDir, this.keyBytes,
-                            metadataRet.getMetadataEncryptLen(), metadata);
+            String destFullPath = decryptFile(metadataRet.getFilePath(), this.destDir,
+                            this.keyBytes, metadataRet.getMetadataEncryptLen(), metadata);
 
             // Update task result
             taskResult.setDestFileSize(new File(destFullPath).length());
             taskResult.setSucceed(true);
-            logger.info("Restore file succeed, src path: " + this.srcPath + ", dest path: " + destFullPath);
+            logger.info("Restore file succeed, src path: " + this.srcPath + ", dest path: "
+                            + destFullPath);
         } catch (Exception e) {
-            logger.info("Restore file failed, file path: " + this.srcPath + ", error msg: " + e.getMessage());
+            logger.info("Restore file failed, file path: " + this.srcPath + ", error msg: "
+                            + e.getMessage());
             taskResult.setSucceed(false);
         } finally {
             taskResult.setSrcFileSize(new File(this.srcPath).length());
@@ -75,15 +77,16 @@ public class RestoreTaskThread implements Callable<TaskResult> {
         return taskResult;
     }
 
-    private String decryptFile(String srcFilePath, String destDirPath, byte[] keyBytes, int metadataLen,
-                    FileMetadata metadata) throws Exception {
+    private String decryptFile(String srcFilePath, String destDirPath, byte[] keyBytes,
+                    int metadataLen, FileMetadata metadata) throws Exception {
         byte[] fileKeyBytes = KeyUtil.getFileKeyBytes(keyBytes, metadata.getKeySalt());
         byte[] fileIVBytes = KeyUtil.getFileIVBytes(metadata.getAesIV());
-        String destFileRelPath = metadata.getFileFullPath().substring(metadata.getFileBasePath().length() + 1);
+        String destFileRelPath = metadata.getFileFullPath()
+                        .substring(metadata.getFileBasePath().length() + 1);
         String fileBasePathName = new File(metadata.getFileBasePath()).getName();
         StringBuilder sb = new StringBuilder();
-        sb.append(destDirPath).append(File.separator).append(fileBasePathName).append(File.separator)
-                        .append(destFileRelPath);
+        sb.append(destDirPath).append(File.separator).append(fileBasePathName)
+                        .append(File.separator).append(destFileRelPath);
         String destFilePath = sb.toString();
 
         // Delete destination file if exist

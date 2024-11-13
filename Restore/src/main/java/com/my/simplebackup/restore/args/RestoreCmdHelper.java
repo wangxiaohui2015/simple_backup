@@ -43,7 +43,8 @@ public class RestoreCmdHelper {
         options.addOption(OPTION_V, "version", false, "Show version.");
         options.addOption(OPTION_S, "source", true, "Source folder path.");
         options.addOption(OPTION_D, "destination", true, "Destination folder path.");
-        options.addOption(OPTION_T, "threads", true, "Threads number used for restore, default is 3.");
+        options.addOption(OPTION_T, "threads", true,
+                        "Threads number used for restore, default is 3.");
         options.addOption(OPTION_M, "mode", true,
                         "Restore mode, value can be: [metadata, fake, restore], default is restore.");
         return options;
@@ -68,7 +69,8 @@ public class RestoreCmdHelper {
         parameter.setSrcPath(cmd.getOptionValue(OPTION_S));
         if (!FileUtil.isDir(parameter.getSrcPath())) {
             throw new IllegalArgumentException(
-                            "Source path doesn't exist or isn't a directory, path: " + parameter.getSrcPath());
+                            "Source path doesn't exist or isn't a directory, path: "
+                                            + parameter.getSrcPath());
         }
 
         // Destination path
@@ -78,7 +80,8 @@ public class RestoreCmdHelper {
         parameter.setDestPath(cmd.getOptionValue(OPTION_D));
         if (!FileUtil.isDir(parameter.getDestPath())) {
             throw new IllegalArgumentException(
-                            "Destination path doesn't exist or isn't a directory, path: " + parameter.getDestPath());
+                            "Destination path doesn't exist or isn't a directory, path: "
+                                            + parameter.getDestPath());
         }
 
         // Threads
@@ -87,8 +90,8 @@ public class RestoreCmdHelper {
             try {
                 int threadNum = Integer.parseInt(thread);
                 if (threadNum <= 0 || threadNum > RESTORE_THREAD_MAX) {
-                    throw new IllegalArgumentException("Invalid thread number: " + thread + ", should be in [1,"
-                                    + RESTORE_THREAD_MAX + "]");
+                    throw new IllegalArgumentException("Invalid thread number: " + thread
+                                    + ", should be in [1," + RESTORE_THREAD_MAX + "]");
                 }
                 parameter.setThreads(threadNum);
             } catch (NumberFormatException e) {
@@ -126,7 +129,8 @@ public class RestoreCmdHelper {
      * @return RestoreParameter
      * @throws Exception Exception
      */
-    public static RestoreParameter resolveRestoreParameter(String[] args, Console console) throws Exception {
+    public static RestoreParameter resolveRestoreParameter(String[] args, Console console)
+                    throws Exception {
         Options options = RestoreCmdHelper.getCmdOptions();
         RestoreParameter parameter = null;
         try {

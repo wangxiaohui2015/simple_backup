@@ -71,7 +71,8 @@ public class AES256Decryptor {
             // Calculate metadata encrypt length
             int metadataEncryptLen = META_DATA_BYTES_LEN + META_DATA_HASH_BYTES_LEN + metadataLen;
 
-            MetadataDecryptResult ret = new MetadataDecryptResult(metadataEncryptLen, metadataBytes, metadataHashBytes);
+            MetadataDecryptResult ret = new MetadataDecryptResult(metadataEncryptLen, metadataBytes,
+                            metadataHashBytes);
             ret.setMetadata(FileMetadataHelper.getFileMetadataObj(metadataBytes));
             ret.setFilePath(filePath);
             return ret;
@@ -88,11 +89,13 @@ public class AES256Decryptor {
      * @param seekLen Seek length
      * @throws Exception Exception
      */
-    public void decryptFile(String srcFilePath, String destFilePath, long seekLen) throws Exception {
+    public void decryptFile(String srcFilePath, String destFilePath, long seekLen)
+                    throws Exception {
         File srcFile = new File(srcFilePath);
         File destFile = new File(destFilePath);
         if (!srcFile.exists() || !srcFile.isFile()) {
-            throw new Exception("sourceFile doesn't exist or sourceFile isn't a file, sourceFile:" + srcFile);
+            throw new Exception("sourceFile doesn't exist or sourceFile isn't a file, sourceFile:"
+                            + srcFile);
         }
         if (!destFile.getParentFile().exists()) {
             destFile.getParentFile().mkdirs();

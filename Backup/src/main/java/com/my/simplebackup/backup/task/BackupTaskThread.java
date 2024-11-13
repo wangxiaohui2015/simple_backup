@@ -35,32 +35,38 @@ public class BackupTaskThread implements Callable<TaskResult> {
             taskResult.setStartTime(new Date().getTime());
 
             // Prepare metadata
-            FileMetadata metadata = FileMetadataHelper.generateFileMetadata(this.backupTaskConfig.getSrcBasePath(),
-                            this.backupTaskConfig.getSrcFullPath(), this.backupTaskConfig.getDestFullPath(),
-                            taskResult.getStartTime(), this.backupTaskConfig.isEnableChecksum());
+            FileMetadata metadata = FileMetadataHelper.generateFileMetadata(
+                            this.backupTaskConfig.getSrcBasePath(),
+                            this.backupTaskConfig.getSrcFullPath(),
+                            this.backupTaskConfig.getDestFullPath(), taskResult.getStartTime(),
+                            this.backupTaskConfig.isEnableChecksum());
             String metadataJSON = FileMetadataHelper.getFileMetadataJSON(metadata);
             byte[] metadataBytes = metadataJSON.getBytes(Constants.UTF_8);
 
             // Encrypt metadata
             byte[] metadataKeyBytes = KeyUtil.getMetadataKeyBytes(this.keyBytes);
             byte[] metadataIVBytes = KeyUtil.getMetadataIVBytes(this.keyBytes);
-            AES256Encryptor metadataEncryptor = new AES256Encryptor(metadataKeyBytes, metadataIVBytes);
-            metadataEncryptor.encryptMetadata(metadataBytes, this.backupTaskConfig.getDestFullPath());
+            AES256Encryptor metadataEncryptor =
+                            new AES256Encryptor(metadataKeyBytes, metadataIVBytes);
+            metadataEncryptor.encryptMetadata(metadataBytes,
+                            this.backupTaskConfig.getDestFullPath());
 
             // Encrypt file
             byte[] fileKeyBytes = KeyUtil.getFileKeyBytes(this.keyBytes, metadata.getKeySalt());
             byte[] fileIVBytes = KeyUtil.getFileIVBytes(metadata.getAesIV());
             AES256Encryptor fileEncryptor = new AES256Encryptor(fileKeyBytes, fileIVBytes);
-            fileEncryptor.encryptFile(this.backupTaskConfig.getSrcFullPath(), this.backupTaskConfig.getDestFullPath());
+            fileEncryptor.encryptFile(this.backupTaskConfig.getSrcFullPath(),
+                            this.backupTaskConfig.getDestFullPath());
 
             // Update task result
             taskResult.setDestFileSize(new File(this.backupTaskConfig.getDestFullPath()).length());
             taskResult.setSucceed(true);
-            logger.info("Backup succeed, src path: " + this.backupTaskConfig.getSrcFullPath() + ", dest path: "
-                            + this.backupTaskConfig.getDestFullPath());
+            logger.info("Backup succeed, src path: " + this.backupTaskConfig.getSrcFullPath()
+                            + ", dest path: " + this.backupTaskConfig.getDestFullPath());
         } catch (Exception e) {
-            logger.info("Backup failed, src path: " + this.backupTaskConfig.getSrcFullPath() + ", dest path: "
-                            + this.backupTaskConfig.getDestFullPath() + ", error msg: " + e.getMessage());
+            logger.info("Backup failed, src path: " + this.backupTaskConfig.getSrcFullPath()
+                            + ", dest path: " + this.backupTaskConfig.getDestFullPath()
+                            + ", error msg: " + e.getMessage());
             taskResult.setSucceed(false);
         } finally {
             taskResult.setSrcFileSize(new File(this.backupTaskConfig.getSrcFullPath()).length());

@@ -22,7 +22,8 @@ public class StatisticsHelper {
      * @param entity StatisticsEntity
      * @param taskResults TaskResult list
      */
-    public static void statAndShowBackupResult(StatisticsEntity entity, List<TaskResult> taskResults) {
+    public static void statAndShowBackupResult(StatisticsEntity entity,
+                    List<TaskResult> taskResults) {
         showStdAndLog("================ Backup Statistics ================");
         statsTaskResults(entity, taskResults);
         showStatInformation(entity);
@@ -34,7 +35,8 @@ public class StatisticsHelper {
      * @param entity StatisticsEntity
      * @param taskResults TaskResult list
      */
-    public static void statAndShowRestoreResult(StatisticsEntity entity, List<TaskResult> taskResults) {
+    public static void statAndShowRestoreResult(StatisticsEntity entity,
+                    List<TaskResult> taskResults) {
         showStdAndLog("================ Restore Statistics ================");
         statsTaskResults(entity, taskResults);
         showStatInformation(entity);
@@ -73,7 +75,8 @@ public class StatisticsHelper {
             if (result.isSucceed()) {
                 entity.setSucceedFiles(entity.getSucceedFiles() + 1);
                 entity.setSucceedFileSize(entity.getSucceedFileSize() + result.getSrcFileSize());
-                entity.setSucceedTargetFileSize(entity.getSucceedTargetFileSize() + result.getDestFileSize());
+                entity.setSucceedTargetFileSize(
+                                entity.getSucceedTargetFileSize() + result.getDestFileSize());
             } else {
                 entity.setFailedFiles(entity.getFailedFiles() + 1);
                 entity.setFailedFileSize(entity.getFailedFileSize() + result.getSrcFileSize());
@@ -88,14 +91,18 @@ public class StatisticsHelper {
     private static void showStatInformation(StatisticsEntity entity) {
         showStdAndLog("Start time: " + TimeUtil.parseDateToStr(new Date(entity.getStartTime())));
         showStdAndLog("End time: " + TimeUtil.parseDateToStr(new Date(entity.getEndTime())));
-        showStdAndLog("Time taken: " + TimeUtil.calculateElapsedTime(entity.getEndTime(), entity.getStartTime()));
+        showStdAndLog("Time taken: " + TimeUtil.calculateElapsedTime(entity.getEndTime(),
+                        entity.getStartTime()));
         showStdAndLog("Rate: " + FileUtil.getFileSizeString(entity.getRate(), false) + "/s");
         showStdAndLog("Total files: " + entity.getTotalFiles());
         showStdAndLog("Total files size: " + FileUtil.getFileSizeString(entity.getTotalFileSize()));
         showStdAndLog("Succeed files: " + entity.getSucceedFiles());
-        showStdAndLog("Succeed files size: " + FileUtil.getFileSizeString(entity.getSucceedFileSize()));
+        showStdAndLog("Succeed files size: "
+                        + FileUtil.getFileSizeString(entity.getSucceedFileSize()));
         showStdAndLog("Failed files: " + entity.getFailedFiles());
-        showStdAndLog("Failed files size: " + FileUtil.getFileSizeString(entity.getFailedFileSize()));
-        showStdAndLog("Succeed target files size: " + FileUtil.getFileSizeString(entity.getSucceedTargetFileSize()));
+        showStdAndLog("Failed files size: "
+                        + FileUtil.getFileSizeString(entity.getFailedFileSize()));
+        showStdAndLog("Succeed target files size: "
+                        + FileUtil.getFileSizeString(entity.getSucceedTargetFileSize()));
     }
 }

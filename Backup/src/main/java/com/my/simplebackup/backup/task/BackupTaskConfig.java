@@ -12,8 +12,8 @@ public class BackupTaskConfig {
 
     public BackupTaskConfig() {}
 
-    public BackupTaskConfig(String srcBasePath, String srcFullPath, String destBaseDir, String destFullPath,
-                    boolean enableChecksum) {
+    public BackupTaskConfig(String srcBasePath, String srcFullPath, String destBaseDir,
+                    String destFullPath, boolean enableChecksum) {
         this.srcBasePath = srcBasePath;
         this.srcFullPath = srcFullPath;
         this.destBasePath = destBaseDir;
