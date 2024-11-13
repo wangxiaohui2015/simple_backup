@@ -15,7 +15,7 @@ public class FileMetadata {
     private String aesVersion = "";
     private String aesIV = "";
     private String keySalt = "";
-    private String checkSum = "";
+    private String checksum = "";
     private String obscure = "";
 
     public String getFileName() {
@@ -98,12 +98,12 @@ public class FileMetadata {
         this.keySalt = keySalt;
     }
 
-    public String getCheckSum() {
-        return checkSum;
+    public String getChecksum() {
+        return checksum;
     }
 
-    public void setCheckSum(String checkSum) {
-        this.checkSum = checkSum;
+    public void setChecksum(String checksum) {
+        this.checksum = checksum;
     }
 
     public String getObscure() {

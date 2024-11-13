@@ -1,6 +1,10 @@
 package com.my.simplebackup.restore.args;
 
+import java.io.Console;
+
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 
@@ -12,14 +16,12 @@ public class RestoreCmdHelper {
 
     public static final String OPTION_H = "h";
     public static final String OPTION_V = "v";
-    public static final String OPTION_K = "k";
     public static final String OPTION_S = "s";
     public static final String OPTION_D = "d";
     public static final String OPTION_T = "t";
     public static final String OPTION_M = "m";
-    public static final String OPTION_F = "f";
 
-    private static final String USAGE = "./restore.sh -k <restore_key> -s <source_dir> -d <destination_dir> [-t <threads> | -m <metadata,fake,restore> | -f <filter_path>]";
+    private static final String USAGE = "./restore.sh -s <source_dir> -d <destination_dir> [-t <threads> | -m <metadata,fake,restore>]";
     private static final int RESTORE_THREAD_MAX = 128;
 
     private static final String MODE_TYPE_METADATA = "metadata";
@@ -32,13 +34,11 @@ public class RestoreCmdHelper {
         Options options = new Options();
         options.addOption(OPTION_H, "help", false, "Show help.");
         options.addOption(OPTION_V, "version", false, "Show version.");
-        options.addOption(OPTION_K, "key", true, "Key used for restore.");
         options.addOption(OPTION_S, "source", true, "Source folder path.");
         options.addOption(OPTION_D, "destination", true, "Destination folder path.");
         options.addOption(OPTION_T, "threads", true, "Threads number used for restore, default is 3.");
         options.addOption(OPTION_M, "mode", true,
                 "Restore mode, value can be: [metadata, fake, restore], default is restore.");
-        options.addOption(OPTION_F, "filter", true, "Path filter, default is '', match all path.");
         return options;
     }
 
@@ -53,12 +53,6 @@ public class RestoreCmdHelper {
 
     public static RestoreParameter getAndCheckParameter(CommandLine cmd) throws Exception {
         RestoreParameter parameter = new RestoreParameter();
-
-        // Key
-        if (!cmd.hasOption(OPTION_K)) {
-            throw new IllegalArgumentException(MISSING_OPTION_MSG + OPTION_K);
-        }
-        parameter.setKeyBytes(cmd.getOptionValue(OPTION_K).getBytes(Constants.UTF_8));
 
         // Source path
         if (!cmd.hasOption(OPTION_S)) {
@@ -108,11 +102,41 @@ public class RestoreCmdHelper {
                 throw new IllegalArgumentException("Invalid mode type: " + mode);
             }
         }
+        return parameter;
+    }
 
-        // Filter
-        if (cmd.hasOption(OPTION_F)) {
-            parameter.setFilter(cmd.getOptionValue(OPTION_F));
+    public static byte[] enterKey(Console console) throws Exception {
+        System.out.print("Enter key: ");
+        char[] passwordArray = console.readPassword();
+        return new String(passwordArray).getBytes(Constants.UTF_8);
+    }
+
+    public static RestoreParameter resolveRestoreParameter(String[] args, Console console) throws Exception {
+        Options options = RestoreCmdHelper.getCmdOptions();
+        RestoreParameter parameter = null;
+        try {
+            CommandLineParser parser = new DefaultParser();
+            CommandLine cmd = parser.parse(options, args);
+            if (cmd.hasOption(RestoreCmdHelper.OPTION_H)) {
+                RestoreCmdHelper.printHelpMsg(options);
+                System.exit(0);
+            } else if (cmd.hasOption(RestoreCmdHelper.OPTION_V)) {
+                RestoreCmdHelper.printVersion();
+                System.exit(0);
+            }
+            parameter = RestoreCmdHelper.getAndCheckParameter(cmd);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            RestoreCmdHelper.printHelpMsg(options);
+            System.exit(-1);
         }
+
+        // Input key
+        System.out.print("Enter key: ");
+        char[] keyArray = console.readPassword();
+        byte[] keyBytes = new String(keyArray).getBytes(Constants.UTF_8);
+        parameter.setKeyBytes(keyBytes);
+
         return parameter;
     }
 }

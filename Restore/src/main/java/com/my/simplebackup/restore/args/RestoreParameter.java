@@ -7,7 +7,6 @@ public class RestoreParameter {
     private String srcPath = "";
     private String destPath = "";
     private MODE_TYPE mode = MODE_TYPE.RESTORE; // Default is RESTORE
-    private String filter = ""; // Default is empty string, match all path
 
     public static enum MODE_TYPE {
         METADATA, FAKE, RESTORE
@@ -51,13 +50,5 @@ public class RestoreParameter {
 
     public void setMode(MODE_TYPE mode) {
         this.mode = mode;
-    }
-
-    public String getFilter() {
-        return filter;
-    }
-
-    public void setFilter(String filter) {
-        this.filter = filter;
     }
 }

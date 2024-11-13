@@ -23,7 +23,7 @@ public class StatisticsHelper {
      * @param taskResults TaskResult list
      */
     public static void statAndShowBackupResult(StatisticsEntity entity, List<TaskResult> taskResults) {
-        logger.info("================ Backup Statistics ================");
+        showStdAndLog("================ Backup Statistics ================");
         statsTaskResults(entity, taskResults);
         showStatInformation(entity);
     }
@@ -35,9 +35,37 @@ public class StatisticsHelper {
      * @param taskResults TaskResult list
      */
     public static void statAndShowRestoreResult(StatisticsEntity entity, List<TaskResult> taskResults) {
-        logger.info("================ Restore Statistics ================");
+        showStdAndLog("================ Restore Statistics ================");
         statsTaskResults(entity, taskResults);
         showStatInformation(entity);
+    }
+
+    /**
+     * Show message on stdio and log
+     * 
+     * @param msg message
+     */
+    public static void showStdAndLog(String msg) {
+        System.out.println(msg);
+        logger.info(msg);
+    }
+
+    /**
+     * Show message on stdio.
+     * 
+     * @param msg message
+     */
+    public static void prt(String msg) {
+        System.out.print(msg);
+    }
+
+    /**
+     * Show message on stdio.
+     * 
+     * @param msg message
+     */
+    public static void prtln(String msg) {
+        System.out.println(msg);
     }
 
     private static void statsTaskResults(StatisticsEntity entity, List<TaskResult> taskResults) {
@@ -58,16 +86,16 @@ public class StatisticsHelper {
     }
 
     private static void showStatInformation(StatisticsEntity entity) {
-        logger.info("Start time: " + TimeUtil.parseDateToStr(new Date(entity.getStartTime())));
-        logger.info("End time: " + TimeUtil.parseDateToStr(new Date(entity.getEndTime())));
-        logger.info("Time taken: " + TimeUtil.calculateElapsedTime(entity.getEndTime(), entity.getStartTime()));
-        logger.info("Rate: " + FileUtil.getFileSizeString(entity.getRate(), false) + "/s");
-        logger.info("Total files: " + entity.getTotalFiles());
-        logger.info("Total files size: " + FileUtil.getFileSizeString(entity.getTotalFileSize()));
-        logger.info("Succeed files: " + entity.getSucceedFiles());
-        logger.info("Succeed files size: " + FileUtil.getFileSizeString(entity.getSucceedFileSize()));
-        logger.info("Failed files: " + entity.getFailedFiles());
-        logger.info("Failed files size: " + FileUtil.getFileSizeString(entity.getFailedFileSize()));
-        logger.info("Succeed target files size: " + FileUtil.getFileSizeString(entity.getSucceedTargetFileSize()));
+        showStdAndLog("Start time: " + TimeUtil.parseDateToStr(new Date(entity.getStartTime())));
+        showStdAndLog("End time: " + TimeUtil.parseDateToStr(new Date(entity.getEndTime())));
+        showStdAndLog("Time taken: " + TimeUtil.calculateElapsedTime(entity.getEndTime(), entity.getStartTime()));
+        showStdAndLog("Rate: " + FileUtil.getFileSizeString(entity.getRate(), false) + "/s");
+        showStdAndLog("Total files: " + entity.getTotalFiles());
+        showStdAndLog("Total files size: " + FileUtil.getFileSizeString(entity.getTotalFileSize()));
+        showStdAndLog("Succeed files: " + entity.getSucceedFiles());
+        showStdAndLog("Succeed files size: " + FileUtil.getFileSizeString(entity.getSucceedFileSize()));
+        showStdAndLog("Failed files: " + entity.getFailedFiles());
+        showStdAndLog("Failed files size: " + FileUtil.getFileSizeString(entity.getFailedFileSize()));
+        showStdAndLog("Succeed target files size: " + FileUtil.getFileSizeString(entity.getSucceedTargetFileSize()));
     }
 }

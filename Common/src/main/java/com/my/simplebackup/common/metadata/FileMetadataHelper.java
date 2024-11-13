@@ -71,7 +71,7 @@ public class FileMetadataHelper {
         metaData.setAesIV(HashUtil.generateRandomString(Constants.METADATA_IV_LEN));
         metaData.setKeySalt(HashUtil.generateRandomString(Constants.METADATA_KEY_SALT_LEN));
         if (enableChecksum) {
-            metaData.setCheckSum(HashUtil.convertBytesToHexStr(HashUtil.getSHA256Hash(srcFile)));
+            metaData.setChecksum(HashUtil.convertBytesToHexStr(HashUtil.getSHA256Hash(srcFile)));
         }
         metaData.setObscure(
                 HashUtil.generateRandomString(Constants.METADATA_OBSCURE_LEN_MIN, Constants.METADATA_OBSCURE_LEN_MAX));

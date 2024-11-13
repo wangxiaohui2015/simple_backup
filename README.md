@@ -2,16 +2,18 @@
 This is a simple project used to backup files based on AES-256, all informations are hided, includes file name, path, directory, etc.
 
 
-## Development Environment
-- JDK: 17, min version >= 1.8.0_162
-- Maven: 3.8.1
-- STS: 4.18.1.RELEASE
-- OS: Ubuntu 21.04
+## Requirement
+- JDK: 17, min version >= 1.8.0
+- Apache Maven: 3.8.1
+- OS: Linux/Windows
 
 
 ## Build
+Before this step, make sure you have configured JDK and Maven successfully.
+
 ```
-git@github.com:wangxiaohui2015/simple_backup.git
+git clone https://github.com/wangxiaohui2015/simple_backup.git
+cd simple_backup
 mvn clean package
 ```
 
@@ -30,6 +32,7 @@ Go to `<Backup>/target/release`, edit configuration file conf/backup.json,
 {
     "thread": 3,
     "key": "changeme",
+    "enableChecksum": false,
     "backups": [
         {
             "src": "",
@@ -40,16 +43,27 @@ Go to `<Backup>/target/release`, edit configuration file conf/backup.json,
 
 ```
 
-- thread: How many threads will be used for backup.
-- key: The password used for encryption.
+- thread: How many threads will be used for backup. Default is 3.
+- key: The password used for encryption. Default is changeme, need to change it for security reason.
+- enableChecksum: If calculate source file checksum during backup. Default is false, may impact backup performance if set this value to true.
 - backups: The source directory to be backup and destination directory to store backup files.
 
 #### Start Backup
-Go to `<Backup>/target/release`, run script `./backup.sh` to start backup.
+Go to `<Backup>/target/release`, run script `backup.sh` or `backup.bat` to start backup tasks.
 
 
 ## Restore
-Go to `<Restore>/target/release`, run below command to start restore,
+Go to `<Restore>/target/release`, run script `restore.sh` or `restore.bat` to start restore tasks.
 
-`java -jar SimpleBackup-restore-3.0.0-RELEASE-jar-with-dependencies.jar`
+Usage of restore command,
+
+```
+usage: ./restore.sh -s <source_dir> -d <destination_dir> [-t <threads> | -m <metadata,fake,restore>]
+ -s,--source <arg>        Source folder path.
+ -d,--destination <arg>   Destination folder path.
+ -t,--threads <arg>       Threads number used for restore, default is 3.
+ -m,--mode <arg>          Restore mode, value can be: [metadata, fake, restore], default is restore.
+ -h,--help                Show help.
+ -v,--version             Show version.
+```
 

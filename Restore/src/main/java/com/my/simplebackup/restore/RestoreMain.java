@@ -1,5 +1,6 @@
 package com.my.simplebackup.restore;
 
+import java.io.Console;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
@@ -8,13 +9,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Options;
 import org.apache.log4j.Logger;
 
 import com.my.simplebackup.common.Constants;
+import com.my.simplebackup.common.FileUtil;
+import com.my.simplebackup.common.ProgressUtil;
 import com.my.simplebackup.common.StringUtil;
 import com.my.simplebackup.common.metadata.FileMetadata;
 import com.my.simplebackup.common.metadata.FileMetadataHelper;
@@ -36,6 +35,7 @@ public class RestoreMain {
 
     private ExecutorService metadataExecutor;
     private ExecutorService taskExecutor;
+    private Console console;
 
     public static void main(String[] args) {
         new RestoreMain(args).startRestore(args);
@@ -50,26 +50,25 @@ public class RestoreMain {
             logger.info("Begin to execute restore task.");
 
             // Resolve parameters
-            RestoreParameter parameter = resolveRestoreParameter(args);
+            RestoreParameter parameter = RestoreCmdHelper.resolveRestoreParameter(args, console);
 
             // Initialize executors
             this.metadataExecutor = Executors.newFixedThreadPool(parameter.getThreads());
             this.taskExecutor = Executors.newFixedThreadPool(parameter.getThreads());
 
             // Start restore task according to mode type
-            List<TaskResult> taskResults;
             if (parameter.getMode() == RestoreParameter.MODE_TYPE.METADATA) {
                 saveMetadata(parameter);
             } else if (parameter.getMode() == RestoreParameter.MODE_TYPE.FAKE) {
                 StatisticsEntity statEntity = new StatisticsEntity();
                 statEntity.startStat();
-                taskResults = restoreFile(parameter, true);
+                List<TaskResult> taskResults = restoreFile(parameter, true);
                 statEntity.endStat();
                 StatisticsHelper.statAndShowRestoreResult(statEntity, taskResults);
             } else {
                 StatisticsEntity statEntity = new StatisticsEntity();
                 statEntity.startStat();
-                taskResults = restoreFile(parameter, false);
+                List<TaskResult> taskResults = restoreFile(parameter, false);
                 statEntity.endStat();
                 StatisticsHelper.statAndShowRestoreResult(statEntity, taskResults);
             }
@@ -95,21 +94,46 @@ public class RestoreMain {
 
     private List<TaskResult> restoreFile(RestoreParameter parameter, boolean isFake) throws Exception {
         List<TaskResult> taskResults = new ArrayList<TaskResult>();
+
+        // Create progress utility to monitor progress
+        StatisticsHelper.showStdAndLog("Calculating data size...");
+        long totalSize = FileUtil.getDirSize(new File(parameter.getSrcPath()));
+        ProgressUtil progressUtil = new ProgressUtil(totalSize);
+        StatisticsHelper.showStdAndLog("\nData Size: " + FileUtil.getFileSizeString(totalSize));
+        StatisticsHelper.showStdAndLog("\nExecuting restore...\n");
+
+        // Submit task and wait all task to be finished
         List<Future<TaskResult>> futureList = new ArrayList<Future<TaskResult>>();
-
-        List<MetadataDecryptResult> retList = getMetadataRetList(parameter);
-        for (MetadataDecryptResult ret : retList) {
-            RestoreTaskThread task = new RestoreTaskThread(parameter.getKeyBytes(), parameter.getDestPath(), ret,
-                    isFake);
-            Future<TaskResult> future = taskExecutor.submit(task);
-            futureList.add(future);
-        }
-
-        // Wait all task to be finished and get results
+        getRestoreFutureList(parameter.getSrcPath(), parameter.getDestPath(), parameter.getKeyBytes(), isFake,
+                futureList);
         for (Future<TaskResult> future : futureList) {
-            taskResults.add(future.get());
+            TaskResult result = future.get();
+            double percentage = progressUtil.getProgress(result.getSrcFileSize());
+            String percentageStr = String.format("%.2f", percentage);
+            StatisticsHelper.prt("Completed " + percentageStr + "%. \r");
+            taskResults.add(result);
         }
+        StatisticsHelper.prtln("\n\nDone.\n");
         return taskResults;
+    }
+
+    private void getRestoreFutureList(String srcPath, String destDir, byte[] keyBytes, boolean isFake,
+            List<Future<TaskResult>> futureList) throws Exception {
+        File sourceFile = new File(srcPath);
+        File[] files = sourceFile.listFiles();
+        if (null == files) {
+            logger.error("files is null, cannot process restore task, source dir: " + srcPath);
+            return;
+        }
+        for (File file : files) {
+            if (file.isFile()) {
+                RestoreTaskThread task = new RestoreTaskThread(keyBytes, file.getAbsolutePath(), destDir, isFake);
+                Future<TaskResult> future = this.taskExecutor.submit(task);
+                futureList.add(future);
+            } else {
+                getRestoreFutureList(file.getAbsolutePath(), destDir, keyBytes, isFake, futureList);
+            }
+        }
     }
 
     private void getMetadataDecryptRetFutureList(String srcPath, byte[] keyBytes,
@@ -117,7 +141,7 @@ public class RestoreMain {
         File sourceFile = new File(srcPath);
         File[] files = sourceFile.listFiles();
         if (null == files) {
-            logger.error("files is null, cannot process backup task, source dir: " + srcPath);
+            logger.error("files is null, cannot process metadata task, source dir: " + srcPath);
             return;
         }
         for (File file : files) {
@@ -136,9 +160,12 @@ public class RestoreMain {
         List<Future<MetadataDecryptResult>> futureList = new ArrayList<Future<MetadataDecryptResult>>();
         getMetadataDecryptRetFutureList(parameter.getSrcPath(), parameter.getKeyBytes(), futureList);
 
-        // Wait task to complete, and then filter MetadataDecryptRet
+        // Wait task to complete
         for (Future<MetadataDecryptResult> future : futureList) {
             MetadataDecryptResult metadataRet = future.get();
+            if (null == metadataRet) {
+                continue;
+            }
             FileMetadata metadata = metadataRet.getMetadata();
             if (null == metadata) {
                 continue;
@@ -146,46 +173,27 @@ public class RestoreMain {
             if (StringUtil.isEmpty(metadata.getFileFullPath())) {
                 continue;
             }
-            if (!metadata.getFileFullPath().startsWith(parameter.getFilter())) {
-                continue;
-            }
             retList.add(metadataRet);
         }
         return retList;
     }
 
-    private RestoreParameter resolveRestoreParameter(String[] args) {
-        Options options = RestoreCmdHelper.getCmdOptions();
-        RestoreParameter parameter = null;
-        try {
-            CommandLineParser parser = new DefaultParser();
-            CommandLine cmd = parser.parse(options, args);
-            if (cmd.hasOption(RestoreCmdHelper.OPTION_H)) {
-                RestoreCmdHelper.printHelpMsg(options);
-                System.exit(0);
-            } else if (cmd.hasOption(RestoreCmdHelper.OPTION_V)) {
-                RestoreCmdHelper.printVersion();
-                System.exit(0);
-            }
-            parameter = RestoreCmdHelper.getAndCheckParameter(cmd);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            RestoreCmdHelper.printHelpMsg(options);
-            System.exit(-1);
-        }
-        return parameter;
-    }
-
     private void init(String[] args) {
         String rootDir = System.getProperty(Constants.MAIN_ROOT_DIR_KEY);
         if (StringUtil.isEmpty(rootDir) || !new File(rootDir).isDirectory()) {
-            System.out.println("ERROR: rootDir is not set or not exist, system exits.");
+            StatisticsHelper.prtln("ERROR: rootDir is not set or not exist, system exits.");
             System.exit(-1);
         }
         try {
             logger = Logger.getLogger(RestoreMain.class);
         } catch (Exception e) {
-            System.out.println("Failed to initialize logger.");
+            StatisticsHelper.prtln("Failed to initialize logger.");
+            System.exit(-1);
+        }
+
+        console = System.console();
+        if (console == null) {
+            StatisticsHelper.prtln("Cannot get console instance.");
             System.exit(-1);
         }
     }

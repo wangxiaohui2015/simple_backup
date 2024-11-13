@@ -154,6 +154,6 @@ public class FileUtil {
      * @return String format file size
      */
     public static String getFileSizeString(long fileSize) {
-        return getFileSizeString(fileSize, false);
+        return getFileSizeString(fileSize, true);
     }
 }

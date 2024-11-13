@@ -22,14 +22,14 @@ public class RestoreTaskThread implements Callable<TaskResult> {
     private static Logger logger = Logger.getLogger(RestoreTaskThread.class);
 
     private byte[] keyBytes;
+    private String srcPath;
     private String destDir;
-    private MetadataDecryptResult metadataRet;
     private boolean isFake;
 
-    public RestoreTaskThread(byte[] keyBytes, String destDir, MetadataDecryptResult metadataRet, boolean isFake) {
+    public RestoreTaskThread(byte[] keyBytes, String srcPath, String destDir, boolean isFake) {
         this.keyBytes = keyBytes;
         this.destDir = destDir;
-        this.metadataRet = metadataRet;
+        this.srcPath = srcPath;
         this.isFake = isFake;
     }
 
@@ -40,7 +40,11 @@ public class RestoreTaskThread implements Callable<TaskResult> {
             taskResult.setStartTime(new Date().getTime());
 
             // Get metadata
-            FileMetadata metadata = FileMetadataHelper.getFileMetadataObj(metadataRet.getMetadataBytes());
+            byte[] metadataKeyBytes = KeyUtil.getMetadataKeyBytes(this.keyBytes);
+            byte[] metadataIVBytes = KeyUtil.getMetadataIVBytes(this.keyBytes);
+            AES256Decryptor decryptor = new AES256Decryptor(metadataKeyBytes, metadataIVBytes);
+            MetadataDecryptResult metadataRet = decryptor.decryptMetadata(srcPath);
+            FileMetadata metadata = metadataRet.getMetadata();
             String json = FileMetadataHelper.getFileMetadataJSON(metadata);
 
             // Calculate metadata hash
@@ -49,24 +53,22 @@ public class RestoreTaskThread implements Callable<TaskResult> {
 
             // Metadata hash in decrypt file
             String metaDataHash = HashUtil.convertBytesToHexStr(metadataRet.getMetadataHash());
-
-            // Compare metadata hash
             if (!metaDataHash.equals(newMetaDataHash)) {
                 throw new Exception("Metadata hash is inconsist.");
             }
 
             // Decrypt file
-            String destFullPath = decryptFile(this.metadataRet.getFilePath(), this.destDir, this.keyBytes,
+            String destFullPath = decryptFile(metadataRet.getFilePath(), this.destDir, this.keyBytes,
                     metadataRet.getMetadataEncryptLen(), metadata);
 
             // Update task result
             taskResult.setDestFileSize(new File(destFullPath).length());
             taskResult.setSucceed(true);
         } catch (Exception e) {
-            logger.info("Restore metadata failed, file path: " + this.metadataRet.getFilePath(), e);
+            logger.info("Restore file failed, file path: " + this.srcPath + ", error msg: " + e.getMessage());
             taskResult.setSucceed(false);
         } finally {
-            taskResult.setSrcFileSize(new File(this.metadataRet.getFilePath()).length());
+            taskResult.setSrcFileSize(new File(this.srcPath).length());
             taskResult.setFinishTime(new Date().getTime());
         }
         return taskResult;
