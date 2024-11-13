@@ -89,7 +89,7 @@ public class RestoreMain {
         }
         String destPath = parameter.getDestPath() + File.separator + "metadata_" + new Date().getTime() + ".json";
         FileMetadataHelper.saveMetadataListToFile(metadataList, destPath);
-        logger.info("Succeed to save metadata, file path: " + destPath);
+        StatisticsHelper.showStdAndLog("Succeed to save metadata, file path: " + destPath);
     }
 
     private List<TaskResult> restoreFile(RestoreParameter parameter, boolean isFake) throws Exception {
