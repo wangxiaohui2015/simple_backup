@@ -23,11 +23,11 @@ public class StatisticsEntity {
      * @return long result, bytes per second.
      */
     public long calculateRate() {
-        long timeTaken = (endTime - startTime) / 1000; // Second
+        long timeTaken = (this.endTime - this.startTime) / 1000; // Second
         if (timeTaken > 0) {
-            rate = succeedFileSize / timeTaken;
+            this.rate = this.succeedFileSize / timeTaken;
         }
-        return rate;
+        return this.rate;
     }
 
     public void startStat() {

@@ -72,8 +72,8 @@ public class AES256Encryptor {
             byte[] metadataHash = HashUtil.getSHA256Hash(bytes);
 
             // Encrypt metadata
-            SecretKeySpec secretKeySpec = new SecretKeySpec(keyBytes, 0, 32, ALGORITHM);
-            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivBytes, 0, 16);
+            SecretKeySpec secretKeySpec = new SecretKeySpec(this.keyBytes, 0, 32, ALGORITHM);
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(this.ivBytes, 0, 16);
             Cipher cipher = Cipher.getInstance(ALGORITHM_PKCS5PADDING);
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
             byte[] encryptedMetadataBytes = cipher.doFinal(bytes);
@@ -117,8 +117,8 @@ public class AES256Encryptor {
         CipherInputStream cin = null;
         RandomAccessFile rFile = null;
         try {
-            SecretKeySpec secretKeySpec = new SecretKeySpec(keyBytes, 0, 32, ALGORITHM);
-            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivBytes, 0, 16);
+            SecretKeySpec secretKeySpec = new SecretKeySpec(this.keyBytes, 0, 32, ALGORITHM);
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(this.ivBytes, 0, 16);
             Cipher cipher = Cipher.getInstance(ALGORITHM_PKCS5PADDING);
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
 

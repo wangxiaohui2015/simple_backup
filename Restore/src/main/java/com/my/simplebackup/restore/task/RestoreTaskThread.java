@@ -43,7 +43,7 @@ public class RestoreTaskThread implements Callable<TaskResult> {
             byte[] metadataKeyBytes = KeyUtil.getMetadataKeyBytes(this.keyBytes);
             byte[] metadataIVBytes = KeyUtil.getMetadataIVBytes(this.keyBytes);
             AES256Decryptor decryptor = new AES256Decryptor(metadataKeyBytes, metadataIVBytes);
-            MetadataDecryptResult metadataRet = decryptor.decryptMetadata(srcPath);
+            MetadataDecryptResult metadataRet = decryptor.decryptMetadata(this.srcPath);
             FileMetadata metadata = metadataRet.getMetadata();
             String json = FileMetadataHelper.getFileMetadataJSON(metadata);
 

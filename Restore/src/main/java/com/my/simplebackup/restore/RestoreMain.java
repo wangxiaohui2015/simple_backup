@@ -33,7 +33,6 @@ public class RestoreMain {
 
     private static Logger logger;
 
-    private ExecutorService metadataExecutor;
     private ExecutorService taskExecutor;
     private Console console;
 
@@ -52,8 +51,7 @@ public class RestoreMain {
             // Resolve parameters
             RestoreParameter parameter = RestoreCmdHelper.resolveRestoreParameter(args, console);
 
-            // Initialize executors
-            this.metadataExecutor = Executors.newFixedThreadPool(parameter.getThreads());
+            // Initialize task executor
             this.taskExecutor = Executors.newFixedThreadPool(parameter.getThreads());
 
             // Start restore task according to mode type
@@ -75,7 +73,6 @@ public class RestoreMain {
         } catch (Throwable e) {
             logger.info("Exception occurred while executing restore task.", e);
         } finally {
-            this.metadataExecutor.shutdown();
             this.taskExecutor.shutdown();
             logger.info("End to execute restore task.");
         }
@@ -150,7 +147,7 @@ public class RestoreMain {
         for (File file : files) {
             if (file.isFile()) {
                 MetadataTaskThread task = new MetadataTaskThread(keyBytes, file.getAbsolutePath());
-                Future<MetadataDecryptResult> future = this.metadataExecutor.submit(task);
+                Future<MetadataDecryptResult> future = this.taskExecutor.submit(task);
                 futureList.add(future);
             } else {
                 getMetadataDecryptRetFutureList(file.getAbsolutePath(), keyBytes, futureList);

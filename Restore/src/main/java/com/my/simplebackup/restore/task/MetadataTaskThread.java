@@ -25,10 +25,10 @@ public class MetadataTaskThread implements Callable<MetadataDecryptResult> {
     @Override
     public MetadataDecryptResult call() throws Exception {
         try {
-            byte[] metadataKeyBytes = KeyUtil.getMetadataKeyBytes(keyBytes);
-            byte[] metadataIVBytes = KeyUtil.getMetadataIVBytes(keyBytes);
+            byte[] metadataKeyBytes = KeyUtil.getMetadataKeyBytes(this.keyBytes);
+            byte[] metadataIVBytes = KeyUtil.getMetadataIVBytes(this.keyBytes);
             AES256Decryptor decryptor = new AES256Decryptor(metadataKeyBytes, metadataIVBytes);
-            MetadataDecryptResult ret = decryptor.decryptMetadata(fileFullPath);
+            MetadataDecryptResult ret = decryptor.decryptMetadata(this.fileFullPath);
             logger.info("Restore metadata succeed, file path: " + this.fileFullPath);
             return ret;
         } catch (Exception e) {

@@ -62,8 +62,8 @@ public class AES256Decryptor {
             byte[] encryptedMetadataBytes = new byte[metadataLen];
             rf.read(encryptedMetadataBytes);
 
-            SecretKeySpec secretKeySpec = new SecretKeySpec(keyBytes, 0, 32, ALGORITHM);
-            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivBytes, 0, 16);
+            SecretKeySpec secretKeySpec = new SecretKeySpec(this.keyBytes, 0, 32, ALGORITHM);
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(this.ivBytes, 0, 16);
             Cipher cipher = Cipher.getInstance(ALGORITHM_PKCS5PADDING);
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
             byte[] metadataBytes = cipher.doFinal(encryptedMetadataBytes);
@@ -108,8 +108,8 @@ public class AES256Decryptor {
         CipherOutputStream cout = null;
         RandomAccessFile rFile = null;
         try {
-            SecretKeySpec secretKeySpec = new SecretKeySpec(keyBytes, 0, 32, ALGORITHM);
-            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivBytes, 0, 16);
+            SecretKeySpec secretKeySpec = new SecretKeySpec(this.keyBytes, 0, 32, ALGORITHM);
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(this.ivBytes, 0, 16);
             Cipher cipher = Cipher.getInstance(ALGORITHM_PKCS5PADDING);
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
 
