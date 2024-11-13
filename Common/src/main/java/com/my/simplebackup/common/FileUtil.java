@@ -46,6 +46,11 @@ public class FileUtil {
         }
     }
 
+    /**
+     * Close random access file.
+     * 
+     * @param rFile Random access file
+     */
     public static void closeRandomAccessFile(RandomAccessFile rFile) {
         if (null != rFile) {
             try {
@@ -124,7 +129,7 @@ public class FileUtil {
     /**
      * Get file size string by file bytes
      * 
-     * @param fileSize      file size, bytes
+     * @param fileSize file size, bytes
      * @param isAppendBytes is append bytes
      * @return String format file size
      */

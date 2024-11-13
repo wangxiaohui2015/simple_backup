@@ -37,7 +37,7 @@ public class BackupConfigManager {
         int thread = this.config.getThread();
         if (thread < CONFIG_THREAD_MIN || thread > CONFIG_THREAD_MAX) {
             throw new IllegalArgumentException(
-                    "Thread number must be in [" + CONFIG_THREAD_MIN + "," + CONFIG_THREAD_MAX + "], " + msg);
+                            "Thread number must be in [" + CONFIG_THREAD_MIN + "," + CONFIG_THREAD_MAX + "], " + msg);
         }
 
         // check key

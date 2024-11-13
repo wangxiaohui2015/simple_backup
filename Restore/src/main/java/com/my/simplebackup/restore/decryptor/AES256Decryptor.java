@@ -83,9 +83,9 @@ public class AES256Decryptor {
     /**
      * Decrypt file.
      * 
-     * @param srcFilePath  Source file path
+     * @param srcFilePath Source file path
      * @param destFilePath Destination file path
-     * @param seekLen      Seek length
+     * @param seekLen Seek length
      * @throws Exception Exception
      */
     public void decryptFile(String srcFilePath, String destFilePath, long seekLen) throws Exception {

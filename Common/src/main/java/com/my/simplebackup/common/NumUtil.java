@@ -6,8 +6,8 @@ package com.my.simplebackup.common;
 public class NumUtil {
 
     /**
-     * Convert a int number to 4-length byte array. Note: 0xFF means 00000000
-     * 00000000 00000000 11111111, can be used to get last 8 bits of a number.
+     * Convert a int number to 4-length byte array. Note: 0xFF means 00000000 00000000 00000000
+     * 11111111, can be used to get last 8 bits of a number.
      * 
      * @param n int number
      * @return 4-length byte array

@@ -22,14 +22,14 @@ import com.my.simplebackup.common.NumUtil;
  * Use AES256 algorithm to encrypt metadata and file. </br>
  *
  * Below is format of the final encrypted file, </br>
- * <b>metadata len(4 bytes) + metadata HASH(32 bytes) + encrypted metadata +
- * encrypted file </b>
+ * <b>metadata len(4 bytes) + metadata HASH(32 bytes) + encrypted metadata + encrypted file </b>
  * 
  * </br>
- * metadata len: use 4 bytes to store the length of "encrypted metadata".
- * metadata HASH: use 32 bytes to store SHA256 of "encrypted metadata".
- * encrypted metadata: encrypted metadata, which includes the basic information
- * of "encrypted file". encrypted file: encrypted content of original file.
+ * metadata len: use 4 bytes to store the length of "encrypted metadata". </br>
+ * metadata HASH: use 32 bytes to store SHA256 of "encrypted metadata". </br>
+ * encrypted metadata: encrypted metadata, which includes the basic information of "encrypted file".
+ * </br>
+ * encrypted file: encrypted content of original file.
  * 
  */
 public class AES256Encryptor {
@@ -51,7 +51,7 @@ public class AES256Encryptor {
     /**
      * Encrypt metadata.
      * 
-     * @param bytes        metadata bytes
+     * @param bytes metadata bytes
      * @param destFilePath destination file path
      * @throws Exception Exception
      */
@@ -99,7 +99,7 @@ public class AES256Encryptor {
      * Encrypt file.
      * 
      * @param sourceFilePath source file path
-     * @param destFilePath   destination file path
+     * @param destFilePath destination file path
      * @throws Exception Exception
      */
     public void encryptFile(String sourceFilePath, String destFilePath) throws Exception {

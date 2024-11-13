@@ -52,18 +52,19 @@ public class RestoreTaskThread implements Callable<TaskResult> {
             String newMetaDataHash = HashUtil.convertBytesToHexStr(hashBytes);
 
             // Metadata hash in decrypt file
-            String metaDataHash = HashUtil.convertBytesToHexStr(metadataRet.getMetadataHash());
-            if (!metaDataHash.equals(newMetaDataHash)) {
+            String metadataHash = HashUtil.convertBytesToHexStr(metadataRet.getMetadataHash());
+            if (!metadataHash.equals(newMetaDataHash)) {
                 throw new Exception("Metadata hash is inconsist.");
             }
 
             // Decrypt file
             String destFullPath = decryptFile(metadataRet.getFilePath(), this.destDir, this.keyBytes,
-                    metadataRet.getMetadataEncryptLen(), metadata);
+                            metadataRet.getMetadataEncryptLen(), metadata);
 
             // Update task result
             taskResult.setDestFileSize(new File(destFullPath).length());
             taskResult.setSucceed(true);
+            logger.info("Restore file succeed, src path: " + this.srcPath + ", dest path: " + destFullPath);
         } catch (Exception e) {
             logger.info("Restore file failed, file path: " + this.srcPath + ", error msg: " + e.getMessage());
             taskResult.setSucceed(false);
@@ -74,15 +75,15 @@ public class RestoreTaskThread implements Callable<TaskResult> {
         return taskResult;
     }
 
-    private String decryptFile(String srcFilePath, String destDirPath, byte[] keyBytes, int metaDataLen,
-            FileMetadata metaData) throws Exception {
-        byte[] fileKeyBytes = KeyUtil.getFileKeyBytes(keyBytes, metaData.getKeySalt());
-        byte[] fileIVBytes = KeyUtil.getFileIVBytes(metaData.getAesIV());
-        String destFileRelPath = metaData.getFileFullPath().substring(metaData.getFileBasePath().length() + 1);
-        String fileBasePathName = new File(metaData.getFileBasePath()).getName();
+    private String decryptFile(String srcFilePath, String destDirPath, byte[] keyBytes, int metadataLen,
+                    FileMetadata metadata) throws Exception {
+        byte[] fileKeyBytes = KeyUtil.getFileKeyBytes(keyBytes, metadata.getKeySalt());
+        byte[] fileIVBytes = KeyUtil.getFileIVBytes(metadata.getAesIV());
+        String destFileRelPath = metadata.getFileFullPath().substring(metadata.getFileBasePath().length() + 1);
+        String fileBasePathName = new File(metadata.getFileBasePath()).getName();
         StringBuilder sb = new StringBuilder();
         sb.append(destDirPath).append(File.separator).append(fileBasePathName).append(File.separator)
-                .append(destFileRelPath);
+                        .append(destFileRelPath);
         String destFilePath = sb.toString();
 
         // Delete destination file if exist
@@ -99,7 +100,7 @@ public class RestoreTaskThread implements Callable<TaskResult> {
             destFile.createNewFile();
         } else {
             AES256Decryptor decryptor = new AES256Decryptor(fileKeyBytes, fileIVBytes);
-            decryptor.decryptFile(srcFilePath, destFilePath, metaDataLen);
+            decryptor.decryptFile(srcFilePath, destFilePath, metadataLen);
         }
         return destFilePath;
     }

@@ -19,7 +19,7 @@ public class StatisticsHelper {
     /**
      * Statistic and show backup result.
      * 
-     * @param entity      StatisticsEntity
+     * @param entity StatisticsEntity
      * @param taskResults TaskResult list
      */
     public static void statAndShowBackupResult(StatisticsEntity entity, List<TaskResult> taskResults) {
@@ -31,7 +31,7 @@ public class StatisticsHelper {
     /**
      * Statistic and show restore result.
      * 
-     * @param entity      StatisticsEntity
+     * @param entity StatisticsEntity
      * @param taskResults TaskResult list
      */
     public static void statAndShowRestoreResult(StatisticsEntity entity, List<TaskResult> taskResults) {

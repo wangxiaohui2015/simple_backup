@@ -52,6 +52,13 @@ public class TimeUtil {
         return sb.toString();
     }
 
+    /**
+     * Parse a string to Date object.
+     * 
+     * @param str string
+     * @return Date object
+     * @throws Exception Exception
+     */
     public static Date parseStrToDate(String str) throws Exception {
         return format.parse(str);
     }

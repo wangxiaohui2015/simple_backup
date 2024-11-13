@@ -17,6 +17,11 @@ public class StatisticsEntity {
     private long endTime;
     private long rate;
 
+    /**
+     * Calculate task rate.
+     * 
+     * @return long result, bytes per second.
+     */
     public long calculateRate() {
         long timeTaken = (endTime - startTime) / 1000; // Second
         if (timeTaken > 0) {

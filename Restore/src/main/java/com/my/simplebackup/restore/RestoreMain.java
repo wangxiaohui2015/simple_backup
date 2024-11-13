@@ -72,8 +72,8 @@ public class RestoreMain {
                 statEntity.endStat();
                 StatisticsHelper.statAndShowRestoreResult(statEntity, taskResults);
             }
-        } catch (Exception e) {
-            logger.info("Exception occurred to execute restore task.", e);
+        } catch (Throwable e) {
+            logger.info("Exception occurred while executing restore task.", e);
         } finally {
             this.metadataExecutor.shutdown();
             this.taskExecutor.shutdown();
@@ -96,7 +96,7 @@ public class RestoreMain {
         List<TaskResult> taskResults = new ArrayList<TaskResult>();
 
         // Create progress utility to monitor progress
-        StatisticsHelper.showStdAndLog("Calculating data size...");
+        StatisticsHelper.showStdAndLog("\nCalculating data size...");
         long totalSize = FileUtil.getDirSize(new File(parameter.getSrcPath()));
         ProgressUtil progressUtil = new ProgressUtil(totalSize);
         StatisticsHelper.showStdAndLog("\nData Size: " + FileUtil.getFileSizeString(totalSize));
@@ -105,7 +105,7 @@ public class RestoreMain {
         // Submit task and wait all task to be finished
         List<Future<TaskResult>> futureList = new ArrayList<Future<TaskResult>>();
         getRestoreFutureList(parameter.getSrcPath(), parameter.getDestPath(), parameter.getKeyBytes(), isFake,
-                futureList);
+                        futureList);
         for (Future<TaskResult> future : futureList) {
             TaskResult result = future.get();
             double percentage = progressUtil.getProgress(result.getSrcFileSize());
@@ -118,7 +118,7 @@ public class RestoreMain {
     }
 
     private void getRestoreFutureList(String srcPath, String destDir, byte[] keyBytes, boolean isFake,
-            List<Future<TaskResult>> futureList) throws Exception {
+                    List<Future<TaskResult>> futureList) throws Exception {
         File sourceFile = new File(srcPath);
         File[] files = sourceFile.listFiles();
         if (null == files) {
@@ -137,7 +137,7 @@ public class RestoreMain {
     }
 
     private void getMetadataDecryptRetFutureList(String srcPath, byte[] keyBytes,
-            List<Future<MetadataDecryptResult>> futureList) throws Exception {
+                    List<Future<MetadataDecryptResult>> futureList) throws Exception {
         File sourceFile = new File(srcPath);
         File[] files = sourceFile.listFiles();
         if (null == files) {
@@ -193,7 +193,7 @@ public class RestoreMain {
 
         console = System.console();
         if (console == null) {
-            StatisticsHelper.prtln("Cannot get console instance.");
+            StatisticsHelper.prtln("Failed to get console instance.");
             System.exit(-1);
         }
     }

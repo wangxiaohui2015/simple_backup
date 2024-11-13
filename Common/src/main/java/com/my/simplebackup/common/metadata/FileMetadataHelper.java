@@ -17,14 +17,14 @@ public class FileMetadataHelper {
     /**
      * Get metadata JSON string from FileMetaData object.
      * 
-     * @param metaData FileMetaData
+     * @param metadata FileMetadata
      * @return JSON string
      * @throws Exception Exception
      */
-    public static String getFileMetadataJSON(FileMetadata metaData) throws Exception {
+    public static String getFileMetadataJSON(FileMetadata metadata) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            String json = mapper.writeValueAsString(metaData);
+            String json = mapper.writeValueAsString(metadata);
             return json;
         } catch (JsonProcessingException e) {
             throw e;
@@ -40,48 +40,48 @@ public class FileMetadataHelper {
      */
     public static FileMetadata getFileMetadataObj(byte[] bytes) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
-        FileMetadata metaData = mapper.readValue(bytes, FileMetadata.class);
-        return metaData;
+        FileMetadata metadata = mapper.readValue(bytes, FileMetadata.class);
+        return metadata;
     }
 
     /**
      * 
      * Generate file metadata.
      * 
-     * @param srcBasePath    src base path
-     * @param srcFullPath    src full path
-     * @param destFullPath   dest full path
-     * @param backupTime     backup time
+     * @param srcBasePath src base path
+     * @param srcFullPath src full path
+     * @param destFullPath dest full path
+     * @param backupTime backup time
      * @param enableChecksum Enable checksum
-     * @return
-     * @throws Exception
+     * @return FileMetadata
+     * @throws Exception Exception
      */
     public static FileMetadata generateFileMetadata(String srcBasePath, String srcFullPath, String destFullPath,
-            long backupTime, boolean enableChecksum) throws Exception {
-        FileMetadata metaData = new FileMetadata();
+                    long backupTime, boolean enableChecksum) throws Exception {
+        FileMetadata metadata = new FileMetadata();
         File srcFile = new File(srcFullPath);
-        metaData.setFileName(srcFile.getName());
-        metaData.setFileBasePath(srcBasePath);
-        metaData.setFileFullPath(srcFullPath);
-        metaData.setFileLen(srcFile.length());
-        metaData.setDestFileFullPath(destFullPath);
-        metaData.setBackupTime(backupTime);
-        metaData.setBackupSWVersion(Constants.SW_VERSION);
-        metaData.setAesVersion(Constants.AES_VERSION);
-        metaData.setAesIV(HashUtil.generateRandomString(Constants.METADATA_IV_LEN));
-        metaData.setKeySalt(HashUtil.generateRandomString(Constants.METADATA_KEY_SALT_LEN));
+        metadata.setFileName(srcFile.getName());
+        metadata.setFileBasePath(srcBasePath);
+        metadata.setFileFullPath(srcFullPath);
+        metadata.setFileLen(srcFile.length());
+        metadata.setDestFileFullPath(destFullPath);
+        metadata.setBackupTime(backupTime);
+        metadata.setBackupSWVersion(Constants.SW_VERSION);
+        metadata.setAesVersion(Constants.AES_VERSION);
+        metadata.setAesIV(HashUtil.generateRandomString(Constants.METADATA_IV_LEN));
+        metadata.setKeySalt(HashUtil.generateRandomString(Constants.METADATA_KEY_SALT_LEN));
         if (enableChecksum) {
-            metaData.setChecksum(HashUtil.convertBytesToHexStr(HashUtil.getSHA256Hash(srcFile)));
+            metadata.setChecksum(HashUtil.convertBytesToHexStr(HashUtil.getSHA256Hash(srcFile)));
         }
-        metaData.setObscure(
-                HashUtil.generateRandomString(Constants.METADATA_OBSCURE_LEN_MIN, Constants.METADATA_OBSCURE_LEN_MAX));
-        return metaData;
+        metadata.setObscure(HashUtil.generateRandomString(Constants.METADATA_OBSCURE_LEN_MIN,
+                        Constants.METADATA_OBSCURE_LEN_MAX));
+        return metadata;
     }
 
     /**
      * Save metadata list to file
      * 
-     * @param list     metadata list
+     * @param list metadata list
      * @param destFile destination file
      * @throws Exception Exception
      */
