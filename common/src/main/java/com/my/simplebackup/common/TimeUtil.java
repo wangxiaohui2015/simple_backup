@@ -31,25 +31,13 @@ public class TimeUtil {
         long seconds = (timeDiff - hours * HOUR - minutes * MINUTE) / SECOND;
 
         StringBuffer sb = new StringBuffer();
-        if (hours == 1) {
-            sb.append(hours + " hour, ");
-        } else if (hours > 1) {
-            sb.append(hours + " hours, ");
+        if (hours > 0) {
+            sb.append(hours + (hours > 1 ? " hours, " : " hour, "));
         }
-        if (minutes == 1) {
-            sb.append(minutes + " minute, ");
-        } else if (minutes > 1) {
-            sb.append(minutes + " minutes, ");
+        if (minutes > 0) {
+            sb.append(minutes + (minutes > 1 ? " minutes, " : " minute, "));
         }
-        if (seconds == 1) {
-            sb.append(seconds + " second");
-        } else if (seconds > 1) {
-            sb.append(seconds + " seconds");
-        }
-
-        if ("".equals(sb.toString())) {
-            sb.append("0 second");
-        }
+        sb.append(seconds + (seconds > 1 ? " seconds" : " second"));
         return sb.toString();
     }
 
