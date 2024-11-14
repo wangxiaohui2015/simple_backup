@@ -1,7 +1,6 @@
 package com.my.simplebackup.backup;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -78,7 +77,7 @@ public class BackupMain {
         return taskResults;
     }
 
-    private boolean verifyBackupTask(String srcDir, String destDir) throws IOException {
+    private boolean verifyBackupTask(String srcDir, String destDir) {
         if (StringUtil.isEmpty(srcDir)) {
             logger.warn("sourceDir is null or empty, sourceDir: " + srcDir + ", destDir: "
                             + destDir);
@@ -116,7 +115,7 @@ public class BackupMain {
         }
         for (File file : files) {
             if (file.isFile()) {
-                String srcFullPath = file.getCanonicalPath();
+                String srcFullPath = file.getAbsolutePath();
                 String srcFullPathHash = HashUtil.convertBytesToHexStr(
                                 HashUtil.getSHA256Hash(srcFullPath.getBytes(Constants.UTF_8)));
                 String destFullPath = genDestFullPath(destBaseDir, srcFullPathHash);
@@ -131,7 +130,7 @@ public class BackupMain {
                 Future<TaskResult> future = this.taskExecutor.submit(task);
                 taskFutures.add(future);
             } else {
-                processBackupTask(srcBaseDir, file.getCanonicalPath(), destBaseDir, taskFutures);
+                processBackupTask(srcBaseDir, file.getAbsolutePath(), destBaseDir, taskFutures);
             }
         }
     }

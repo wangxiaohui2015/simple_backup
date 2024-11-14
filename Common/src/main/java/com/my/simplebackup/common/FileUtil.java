@@ -67,16 +67,15 @@ public class FileUtil {
      * @param file1 File
      * @param file2 File
      * @return true: sub file: false: not sub file
-     * @throws IOException IOException
      */
-    public static boolean isSubFile(File file1, File file2) throws IOException {
+    public static boolean isSubFile(File file1, File file2) {
         if (null == file1 || null == file2) {
             return false;
         }
-        if (file1.getCanonicalPath().indexOf(file2.getCanonicalPath()) != -1) {
+        if (file1.getAbsolutePath().indexOf(file2.getAbsolutePath()) != -1) {
             return true;
         }
-        if (file2.getCanonicalPath().indexOf(file1.getCanonicalPath()) != -1) {
+        if (file2.getAbsolutePath().indexOf(file1.getAbsolutePath()) != -1) {
             return true;
         }
         return false;
