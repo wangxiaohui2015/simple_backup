@@ -13,8 +13,8 @@
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
     <modules>
-        <module>Common</module>
-        <module>Backup</module>
-        <module>Restore</module>
+        <module>common</module>
+        <module>backup</module>
+        <module>restore</module>
     </modules>
 </project>

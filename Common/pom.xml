@@ -7,7 +7,7 @@
         <artifactId>simplebackup</artifactId>
         <version>3.0.0-RELEASE</version>
     </parent>
-    <artifactId>Common</artifactId>
+    <artifactId>common</artifactId>
     <properties>
         <json.version>2.16.1</json.version>
         <log4j.version>1.2.17</log4j.version>

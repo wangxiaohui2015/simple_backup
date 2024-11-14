@@ -7,12 +7,12 @@
         <artifactId>simplebackup</artifactId>
         <version>3.0.0-RELEASE</version>
     </parent>
-    <artifactId>Restore</artifactId>
+    <artifactId>restore</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>com.my.backup</groupId>
-            <artifactId>Common</artifactId>
+            <artifactId>common</artifactId>
             <version>3.0.0-RELEASE</version>
         </dependency>
         <dependency>
@@ -71,7 +71,8 @@
                         </goals>
                         <configuration>
                             <finalName>
-                                SimpleBackup-restore-${project.version}</finalName>
+                                ${project.parent.artifactId}-${project.artifactId}-${project.version}
+                            </finalName>
                             <archive>
                                 <manifest>
                                     <mainClass>
