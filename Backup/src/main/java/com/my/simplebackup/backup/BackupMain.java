@@ -1,6 +1,7 @@
 package com.my.simplebackup.backup;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -61,8 +62,8 @@ public class BackupMain {
 
         List<BackupItem> backupItems = this.configManager.getBackupConfig().getBackups();
         for (BackupItem item : backupItems) {
-            String srcDir = item.getSrc();
-            String destDir = item.getDest();
+            String srcDir = new File(item.getSrc()).getCanonicalPath();
+            String destDir = new File(item.getDest()).getCanonicalPath();
             if (!verifyBackupTask(srcDir, destDir)) {
                 continue;
             }
@@ -77,7 +78,7 @@ public class BackupMain {
         return taskResults;
     }
 
-    private boolean verifyBackupTask(String srcDir, String destDir) {
+    private boolean verifyBackupTask(String srcDir, String destDir) throws IOException {
         if (StringUtil.isEmpty(srcDir)) {
             logger.warn("sourceDir is null or empty, sourceDir: " + srcDir + ", destDir: "
                             + destDir);
@@ -114,8 +115,8 @@ public class BackupMain {
             return;
         }
         for (File file : files) {
+            String srcFullPath = srcFullDir + File.separator + file.getName();
             if (file.isFile()) {
-                String srcFullPath = file.getAbsolutePath();
                 String srcFullPathHash = HashUtil.convertBytesToHexStr(
                                 HashUtil.getSHA256Hash(srcFullPath.getBytes(Constants.UTF_8)));
                 String destFullPath = genDestFullPath(destBaseDir, srcFullPathHash);
@@ -130,7 +131,7 @@ public class BackupMain {
                 Future<TaskResult> future = this.taskExecutor.submit(task);
                 taskFutures.add(future);
             } else {
-                processBackupTask(srcBaseDir, file.getAbsolutePath(), destBaseDir, taskFutures);
+                processBackupTask(srcBaseDir, srcFullPath, destBaseDir, taskFutures);
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.my.simplebackup.restore.args;
 
 import java.io.Console;
+import java.io.File;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -66,7 +67,7 @@ public class RestoreCmdHelper {
         if (!cmd.hasOption(OPTION_S)) {
             throw new IllegalArgumentException(MISSING_OPTION_MSG + OPTION_S);
         }
-        parameter.setSrcPath(cmd.getOptionValue(OPTION_S));
+        parameter.setSrcPath(new File(cmd.getOptionValue(OPTION_S)).getCanonicalPath());
         if (!FileUtil.isDir(parameter.getSrcPath())) {
             throw new IllegalArgumentException(
                             "Source path doesn't exist or isn't a directory, path: "
@@ -77,11 +78,18 @@ public class RestoreCmdHelper {
         if (!cmd.hasOption(OPTION_D)) {
             throw new IllegalArgumentException(MISSING_OPTION_MSG + OPTION_D);
         }
-        parameter.setDestPath(cmd.getOptionValue(OPTION_D));
+        parameter.setDestPath(new File(cmd.getOptionValue(OPTION_D)).getCanonicalPath());
         if (!FileUtil.isDir(parameter.getDestPath())) {
             throw new IllegalArgumentException(
                             "Destination path doesn't exist or isn't a directory, path: "
                                             + parameter.getDestPath());
+        }
+
+        // Source path and destination path cannot be sub path
+        if (FileUtil.isSubFile(new File(parameter.getSrcPath()),
+                        new File(parameter.getDestPath()))) {
+            throw new IllegalArgumentException(
+                            "Source path is the sub path of dest path, or dest path is the sub path of source path.");
         }
 
         // Threads

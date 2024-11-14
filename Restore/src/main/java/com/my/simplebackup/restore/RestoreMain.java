@@ -125,13 +125,14 @@ public class RestoreMain {
             return;
         }
         for (File file : files) {
+            String srcFullPath = srcPath + File.separator + file.getName();
             if (file.isFile()) {
-                RestoreTaskThread task = new RestoreTaskThread(keyBytes, file.getAbsolutePath(),
-                                destDir, isFake);
+                RestoreTaskThread task =
+                                new RestoreTaskThread(keyBytes, srcFullPath, destDir, isFake);
                 Future<TaskResult> future = this.taskExecutor.submit(task);
                 futureList.add(future);
             } else {
-                getRestoreFutureList(file.getAbsolutePath(), destDir, keyBytes, isFake, futureList);
+                getRestoreFutureList(srcFullPath, destDir, keyBytes, isFake, futureList);
             }
         }
     }
@@ -145,12 +146,13 @@ public class RestoreMain {
             return;
         }
         for (File file : files) {
+            String srcFullPath = srcPath + File.separator + file.getName();
             if (file.isFile()) {
-                MetadataTaskThread task = new MetadataTaskThread(keyBytes, file.getAbsolutePath());
+                MetadataTaskThread task = new MetadataTaskThread(keyBytes, srcFullPath);
                 Future<MetadataDecryptResult> future = this.taskExecutor.submit(task);
                 futureList.add(future);
             } else {
-                getMetadataDecryptRetFutureList(file.getAbsolutePath(), keyBytes, futureList);
+                getMetadataDecryptRetFutureList(srcFullPath, keyBytes, futureList);
             }
         }
     }

@@ -67,3 +67,7 @@ usage: ./restore.sh -s <source_dir> -d <destination_dir> [-t <threads> | -m <met
  -v,--version             Show version.
 ```
 
+
+## Limitations
+- Symbolic link: For symbolic link files, will backup real file instead of symbolic link, and will restore real file instead of symbolic link.
+- Empty folder: Empty folder will be skipped during backup and restore.
