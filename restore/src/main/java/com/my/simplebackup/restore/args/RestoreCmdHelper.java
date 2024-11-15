@@ -31,7 +31,9 @@ public class RestoreCmdHelper {
     private static final String MODE_TYPE_FAKE = "fake";
     private static final String MODE_TYPE_RESTORE = "restore";
 
-    private static final String MISSING_OPTION_MSG = "Missing required option: ";
+    private static final String MISSING_OPTION_MSG = "missing required option: ";
+
+    private static final String ERROR_PREFIX = "ERROR: ";
 
     /**
      * Get command options object.
@@ -70,7 +72,7 @@ public class RestoreCmdHelper {
         parameter.setSrcPath(new File(cmd.getOptionValue(OPTION_S)).getCanonicalPath());
         if (!FileUtil.isDir(parameter.getSrcPath())) {
             throw new IllegalArgumentException(
-                            "Source path doesn't exist or isn't a directory, path: "
+                            "source path doesn't exist or isn't a directory, path: "
                                             + parameter.getSrcPath());
         }
 
@@ -81,7 +83,7 @@ public class RestoreCmdHelper {
         parameter.setDestPath(new File(cmd.getOptionValue(OPTION_D)).getCanonicalPath());
         if (!FileUtil.isDir(parameter.getDestPath())) {
             throw new IllegalArgumentException(
-                            "Destination path doesn't exist or isn't a directory, path: "
+                            "destination path doesn't exist or isn't a directory, path: "
                                             + parameter.getDestPath());
         }
 
@@ -89,7 +91,7 @@ public class RestoreCmdHelper {
         if (FileUtil.isSubFile(new File(parameter.getSrcPath()),
                         new File(parameter.getDestPath()))) {
             throw new IllegalArgumentException(
-                            "Source path is the sub path of dest path, or dest path is the sub path of source path.");
+                            "source path cannot be the sub path of dest path, or dest path cannot be the sub path of source path.");
         }
 
         // Threads
@@ -98,12 +100,12 @@ public class RestoreCmdHelper {
             try {
                 int threadNum = Integer.parseInt(thread);
                 if (threadNum <= 0 || threadNum > RESTORE_THREAD_MAX) {
-                    throw new IllegalArgumentException("Invalid thread number: " + thread
+                    throw new IllegalArgumentException("invalid thread number: " + thread
                                     + ", should be in [1," + RESTORE_THREAD_MAX + "]");
                 }
                 parameter.setThreads(threadNum);
             } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Invalid thread number: " + thread);
+                throw new IllegalArgumentException("invalid thread number: " + thread);
             }
         }
 
@@ -117,7 +119,7 @@ public class RestoreCmdHelper {
             } else if (MODE_TYPE_RESTORE.equals(mode)) {
                 parameter.setMode(MODE_TYPE.RESTORE);
             } else {
-                throw new IllegalArgumentException("Invalid mode type: " + mode);
+                throw new IllegalArgumentException("invalid mode type: " + mode);
             }
         }
         return parameter;
@@ -153,7 +155,7 @@ public class RestoreCmdHelper {
             }
             parameter = RestoreCmdHelper.getAndCheckParameter(cmd);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println(ERROR_PREFIX + e.getMessage());
             RestoreCmdHelper.printHelpMsg(options);
             System.exit(-1);
         }
