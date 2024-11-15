@@ -1,0 +1,11 @@
+{
+    "thread": 3,
+    "key": "changeme",
+    "enableChecksum": false,
+    "backups": [
+        {
+            "src": "",
+            "dest": ""
+        }
+    ]
+}
