@@ -68,7 +68,7 @@ public class BackupMain {
                 continue;
             }
             logger.info("Processing backup task, sourceDir: " + srcDir + ", destDir: " + destDir);
-            processBackupTask(srcDir, srcDir, destDir, taskFutures);
+            processBackupTask(srcDir, srcDir, destDir, taskFutures, item);
         }
 
         // Wait all task to be finished and get results
@@ -107,8 +107,11 @@ public class BackupMain {
     }
 
     private void processBackupTask(String srcBaseDir, String srcFullDir, String destBaseDir,
-                    List<Future<TaskResult>> taskFutures) throws Exception {
+                    List<Future<TaskResult>> taskFutures, BackupItem backupItem) throws Exception {
         File sourceFile = new File(srcFullDir);
+        if (!checkExcludeName(backupItem.getExcludeDirs(), sourceFile)) {
+            return;
+        }
         File[] files = sourceFile.listFiles();
         if (null == files) {
             logger.error("files is null, cannot process backup task, source dir: " + srcFullDir);
@@ -117,6 +120,9 @@ public class BackupMain {
         for (File file : files) {
             String srcFullPath = srcFullDir + File.separator + file.getName();
             if (file.isFile()) {
+                if (!checkExcludeName(backupItem.getExcludeFiles(), file)) {
+                    continue;
+                }
                 String srcFullPathHash = HashUtil.convertBytesToHexStr(
                                 HashUtil.getSHA256Hash(srcFullPath.getBytes(Constants.UTF_8)));
                 String destFullPath = genDestFullPath(destBaseDir, srcFullPathHash);
@@ -131,9 +137,21 @@ public class BackupMain {
                 Future<TaskResult> future = this.taskExecutor.submit(task);
                 taskFutures.add(future);
             } else {
-                processBackupTask(srcBaseDir, srcFullPath, destBaseDir, taskFutures);
+                processBackupTask(srcBaseDir, srcFullPath, destBaseDir, taskFutures, backupItem);
             }
         }
+    }
+
+    private boolean checkExcludeName(List<String> excludeList, File file) {
+        if (null == excludeList) {
+            return true;
+        }
+        for (String exclude : excludeList) {
+            if (file.getName().matches(exclude)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private String genDestFullPath(String destBaseDir, String srcFullPathHash) {

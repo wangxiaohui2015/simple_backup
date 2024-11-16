@@ -2,7 +2,7 @@ package com.my.simplebackup.restore.args;
 
 public class RestoreParameter {
 
-    private int threads = 3; // Default is 3
+    private int threads = 4; // Default is 4
     private byte[] keyBytes;
     private String srcPath = "";
     private String destPath = "";
