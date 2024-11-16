@@ -137,7 +137,7 @@ public class BackupMain {
     }
 
     private String genDestFullPath(String destBaseDir, String srcFullPathHash) {
-        // By default, use the previous 6 characters to be the path directory
+        // By default, use the previous 4 characters to be the path directory
         StringBuilder sb = new StringBuilder(destBaseDir);
         for (int i = 0; i < Constants.BACKUP_TARGET_DIR_LEN; i++) {
             sb.append(File.separator).append(srcFullPathHash.substring(i, i + 1));
