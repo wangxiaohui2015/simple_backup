@@ -30,23 +30,28 @@ Go to `<CODE_BASE>/backup/target/release`, edit configuration file conf/backup.j
 
 ```
 {
-    "thread": 3,
+    "thread": 4,
     "key": "changeme",
     "enableChecksum": false,
     "backups": [
         {
             "src": "",
-            "dest": ""
+            "dest": "",
+            "excludeFiles": [],
+            "excludeDirs": []
         }
     ]
 }
-
 ```
 
-- thread: How many threads will be used for backup. Default is `3`, value range is `[1,128]`.
-- key: The password used for encryption. Default is `changeme`, cannot be empty, need to change it for security reason.
-- enableChecksum: If calculate source file checksum during backup. Default is `false`, may impact backup performance if set this value to `true`.
-- backups: The source directory to be backup and destination directory to store backup files.
+* thread: How many threads will be used for backup. Default is `4`, value range is `[1,256]`.
+* key: The password used for encryption. Default is `changeme`, cannot be empty, need to change it for security reason.
+* enableChecksum: If calculate source file checksum during backup. Default is `false`, may impact backup performance if set this value to `true`.
+* backups: Backup items.
+    * src: Source directory to be backup.
+    * dest: Destination directory to store backup files.
+    * excludeFiles: Exclude file names, supports regular expression.
+    * excludeDirs: Exclude directory names, supports regular expression.
 
 #### Start Backup
 Go to `<CODE_BASE>/backup/target/release`, run script `backup.sh` or `backup.bat` to start backup tasks.
@@ -61,7 +66,7 @@ Usage of restore command,
 usage: ./restore.sh -s <source_dir> -d <destination_dir> [-t <threads> | -m <metadata,fake,restore>]
  -s,--source <arg>        Source folder path.
  -d,--destination <arg>   Destination folder path.
- -t,--threads <arg>       Threads number used for restore, default is 3.
+ -t,--threads <arg>       Threads number used for restore, default is 4.
  -m,--mode <arg>          Restore mode, value can be: [metadata, fake, restore], default is restore.
  -h,--help                Show help.
  -v,--version             Show version.

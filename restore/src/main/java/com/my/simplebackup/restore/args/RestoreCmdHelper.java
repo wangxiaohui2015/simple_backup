@@ -25,7 +25,7 @@ public class RestoreCmdHelper {
 
     private static final String USAGE =
                     "./restore.sh -s <source_dir> -d <destination_dir> [-t <threads> | -m <metadata,fake,restore>]";
-    private static final int RESTORE_THREAD_MAX = 128;
+    private static final int RESTORE_THREAD_MAX = 256;
 
     private static final String MODE_TYPE_METADATA = "metadata";
     private static final String MODE_TYPE_FAKE = "fake";
@@ -47,7 +47,7 @@ public class RestoreCmdHelper {
         options.addOption(OPTION_S, "source", true, "Source folder path.");
         options.addOption(OPTION_D, "destination", true, "Destination folder path.");
         options.addOption(OPTION_T, "threads", true,
-                        "Threads number used for restore, default is 3.");
+                        "Threads number used for restore, default is 4.");
         options.addOption(OPTION_M, "mode", true,
                         "Restore mode, value can be: [metadata, fake, restore], default is restore.");
         return options;

@@ -1,11 +1,13 @@
 {
-    "thread": 3,
+    "thread": 4,
     "key": "changeme",
     "enableChecksum": false,
     "backups": [
         {
             "src": "",
-            "dest": ""
+            "dest": "",
+            "excludeFiles": [],
+            "excludeDirs": []
         }
     ]
 }
