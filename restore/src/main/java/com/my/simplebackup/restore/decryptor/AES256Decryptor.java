@@ -114,7 +114,7 @@ public class AES256Decryptor {
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
 
             // Skip metadata part
-            rFile = new RandomAccessFile(srcFilePath, "rw");
+            rFile = new RandomAccessFile(srcFilePath, "r");
             rFile.seek(seekLen);
             out = new FileOutputStream(destFile);
             cout = new CipherOutputStream(out, cipher);
